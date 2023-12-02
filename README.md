@@ -1,4 +1,5 @@
-<h1>NUTCase - A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h1>
+<h1>NUTCase</h1>
+<h2>A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h2>
 <h3><b>Key features:</b>
 <ul>
   <li>Supports pulling data from a NUT server and formatting the UPS status for the <a href="https://prometheus.io/">Prometheus</a> logging system</li>
