@@ -1,13 +1,13 @@
 <h1>NUTCase</h1>
 <h2>A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h2>
-<h3><b>Key features:</b>
+<h4><b>Key features:</b>
 <ul>
   <li>Supports pulling data from a NUT server and formatting the UPS status for the <a href="https://prometheus.io/">Prometheus</a> logging system</li>
   <li>Supports formatting the UPS status as JSON for use with the beautiful <a href="https://gethomepage.dev">HomePage</a> app.</li>
   <li>The JSON output can be used with <a href="https://github.com/louislam/uptime-kuma">Uptime Kuma</a> and other reporting, alarming and monitoring apps.</li>
   <li>Provides diagnostic information and usage information.</li>
 </ul>
-</h3>
+</h4>
 Please see:
 
 The docker container:
