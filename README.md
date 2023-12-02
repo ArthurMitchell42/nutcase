@@ -254,9 +254,9 @@ Calling this end-point usually uses the _target_ parameter as this is the usual 
 Examples are:
 
 ```
-http://<nutcase-ip>/metrics?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
-http://<nutcase-ip>/metrics?target=A.B.C.D:P    Specifying the address of the server and the port.
-http://<nutcase-ip>/metrics?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
+http://<nutcase-ip>:<port>/metrics?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
+http://<nutcase-ip>:<port>/metrics?target=A.B.C.D:P    Specifying the address of the server and the port.
+http://<nutcase-ip>:<port>/metrics?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
 ```
 
 <h4 id="endpoints-json">The JSON End-point</h4>
@@ -265,9 +265,9 @@ Calling this end-point can use the _target_ parameter or the _addr_ and _port_ p
 Examples are:
 
 ```
-http://<nutcase-ip>/json?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
-http://<nutcase-ip>/json?target=A.B.C.D:P    Specifying the address of the server and the port.
-http://<nutcase-ip>/json?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
+http://<nutcase-ip>:<port>/json?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
+http://<nutcase-ip>:<port>/json?target=A.B.C.D:P    Specifying the address of the server and the port.
+http://<nutcase-ip>:<port>/json?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
 ```
 
 <h3 id="endpoints-diag">Diagnostics</h3>
@@ -275,24 +275,24 @@ http://<nutcase-ip>/json?addr=A.B.C.D&port=P Specifying the address of the serve
 The log end point returns a list of the last 20, or other requested number, of lines from the log file to speed diagnostics.
 
 ```
-http://<nutcase-ip>/log       View the last 20 lines of the log file.
-http://<nutcase-ip>/?lines=30 Optionally view a given number of last lines of the log file.
+http://<nutcase-ip>:<port>/log           View the last 20 lines of the log file.
+http://<nutcase-ip>:<port>/log?lines=30  Optionally view a given number of last lines of the log file.
 ```
 
 <h4 id="endpoints-help">The help End-point</h4>
 The help end point returns basic usage information and advice.
 
 ```
-http://<nutcase-ip>/help
+http://<nutcase-ip>:<port>/help
 ```
 
 <h4 id="endpoints-raw">The raw End-point</h4>
 The raw end point returns JSON data with extra diagnostic information and is intended for support and debugging.
 
 ```
-http://<nutcase-ip>/raw?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
-http://<nutcase-ip>/raw?target=A.B.C.D:P    Specifying the address of the server and the port.
-http://<nutcase-ip>/raw?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
+http://<nutcase-ip>:<port>/raw?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
+http://<nutcase-ip>:<port>/raw?target=A.B.C.D:P    Specifying the address of the server and the port.
+http://<nutcase-ip>:<port>/raw?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
 ```
 
 <h3 id="using-nutcase">Using NUTCase</h3>
