@@ -1,14 +1,28 @@
 <h1>NUTCase</h1>
 <h2>A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h2>
-<h4><b>Key features:</b>
+<h4 id="key-features">Key features:</h4>
+<h5>
 <ul>
   <li>Supports pulling data from a NUT server and formatting the UPS status for the <a href="https://prometheus.io/">Prometheus</a> logging system</li>
   <li>Supports formatting the UPS status as JSON for use with the beautiful <a href="https://gethomepage.dev">HomePage</a> app.</li>
   <li>The JSON output can be used with <a href="https://github.com/louislam/uptime-kuma">Uptime Kuma</a> and other reporting, alarming and monitoring apps.</li>
   <li>Provides diagnostic information and usage information.</li>
 </ul>
-</h4>
-Please see:
+</h5>
+<h4>Contents</h4>
+<h5>
+  
+- First level [here](#Key features)
+    - Second level [see above](#key-features)
+        - Third level
+            - Fourth level
+- First level
+    - Second level
+- First level [Parameters](#parameters)
+    - Second level
+
+</h5>
+<h5>Please see:</h5>
 
 The docker container:
 > https://hub.docker.com/repository/docker/kronos443/nutcase
@@ -170,7 +184,7 @@ services:
 > [!NOTE]
 > The log files will rotate when the reach **250KB** and up to 5 versions will be kept with the extensions <i>.log.1, .log.2, .log.3, .log.4, .log.5</i>
 
-<h2>Parameters</h2>
+<h2 id="parameters">Parameters</h2>
 <p>
 The parameters available are as follows:
 
