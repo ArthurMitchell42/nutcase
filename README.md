@@ -98,6 +98,8 @@ Currently supports AMD64,ARM64 (ARM64V8) (suitable for running on docker under R
 </tr>
 </tbody></table>
 
+[Contents](#contents)
+
 <h3 id="preparation">Preparation and Application Setup</h3>
 <p>
 <h4 id="preparation-system">Your UPS system</h3>
