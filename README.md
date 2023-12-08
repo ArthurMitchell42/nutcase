@@ -4,7 +4,7 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/kronos443/nutcase/latest?logo=docker&style=for-the-badge)](https://hub.docker.com/r/ArthurMitchell42/nutcase/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/kronos443/nutcase?label=Pulls&logo=docker&style=for-the-badge)](https://hub.docker.com/r/ArthurMitchell42/nutcase)
 [![Docker Stars](https://img.shields.io/docker/stars/kronos443/nutcase?label=Stars&logo=docker&style=for-the-badge)](https://hub.docker.com/r/ArthurMitchell42/nutcase)
-<!-- [![Build Status](https://img.shields.io/github/actions/workflow/status/ArthurMitchell42/nutcase/build-image.yml?logo=github&branch=master&style=for-the-badge)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/build-image.yml) -->
+[![Build Status](https://img.shields.io/github/actions/workflow/status/ArthurMitchell42/nutcase/build-image.yml?logo=github&branch=master&style=for-the-badge)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg?style=for-the-badge)](https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8)
 
 <h2 id="introduction">A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h2>
