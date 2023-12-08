@@ -1,10 +1,10 @@
 <h1>NUTCase</h1>
 
-[![Release](https://img.shields.io/github/release/ArthurMitchell42/nutcase.svg?logo=github&style=for-the-badge)](https://github.com/ArthurMitchell42/nutcase/releases/latest)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg?style=for-the-badge)](https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8)
-[![Docker Image Size](https://img.shields.io/docker/image-size/kronos443/nutcase/latest?logo=docker&style=for-the-badge)](https://hub.docker.com/r/ArthurMitchell42/nutcase/tags)
-[![Docker Pulls](https://img.shields.io/docker/pulls/kronos443/nutcase?label=Pulls&logo=docker&style=for-the-badge)](https://hub.docker.com/r/ArthurMitchell42/nutcase)
-[![Docker Stars](https://img.shields.io/docker/stars/kronos443/nutcase?label=Stars&logo=docker&style=for-the-badge)](https://hub.docker.com/r/ArthurMitchell42/nutcase)
+[![Release](https://img.shields.io/github/release/ArthurMitchell42/nutcase.svg?logo=github&style=for-the-badge)](https://github.com/ArthurMitchell42/nutcase/releases/latest)
+[![Docker Image Size](https://img.shields.io/docker/image-size/kronos443/nutcase/latest?logo=docker&style=for-the-badge)](https://hub.docker.com/r/kronos443/nutcase/tags)
+[![Docker Pulls](https://img.shields.io/docker/pulls/kronos443/nutcase?label=Pulls&logo=docker&style=for-the-badge)](https://hub.docker.com/r/kronos443/nutcase)
+[![Docker Stars](https://img.shields.io/docker/stars/kronos443/nutcase?label=Stars&logo=docker&style=for-the-badge)](https://hub.docker.com/r/kronos443/nutcase)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/ArthurMitchell42/nutcase/docker-image.yml?logo=github&branch=main&style=for-the-badge)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml)
 
 <h2 id="introduction">A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h2>
