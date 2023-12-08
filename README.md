@@ -136,13 +136,15 @@ To setup the NUTCase docker container:
 </ol>
 </p>
 
+[Contents](#contents)
+
 <h3 id="nutcase-useage">NUTCase Usage</h3>
 <p>
 Create you container locally by either:
 <br>
 <h4 id="nutcase-useage-docker-cli">Docker CLI</h4>
 
-```
+```shell
 docker run -d \
         --name NUTCase \
         -v /path/to/config:/config \
@@ -158,7 +160,7 @@ The minimal configuration:<br>
 > [!TIP]
 > This assumes you have set the appropriate variables for docker compose
 
-```
+```yaml
 ---
 version: '3.9'
 services:
@@ -178,7 +180,7 @@ services:
 > [!TIP]
 > To help disgnostics and see what information the server is returning about the UPS you can use optional variables such as LOG_LEVEL.
 
-```
+```yaml
 ---
 version: '3.9'
 services:
@@ -257,6 +259,8 @@ The parameters available are as follows:
 </tbody></table>
 </p>
 
+[Contents](#contents)
+
 <h3 id="endpoints">End-points to Access NUTCase</h3>
 <h4 id="endpoints-metrics">Metrics & Text</h4>
 The metrics end point returns data suitable for Prometheus. If called from a browser then plain text is returned.
@@ -279,6 +283,7 @@ http://<nutcase-ip>:<port>/json?target=A.B.C.D      Specifying the address of th
 http://<nutcase-ip>:<port>/json?target=A.B.C.D:P    Specifying the address of the server and the port.
 http://<nutcase-ip>:<port>/json?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
 ```
+[Contents](#contents)
 
 <h3 id="endpoints-diag">Diagnostics</h3>
 <h4 id="endpoints-log">The log End-point</h4>
@@ -305,11 +310,13 @@ http://<nutcase-ip>:<port>/raw?target=A.B.C.D:P    Specifying the address of the
 http://<nutcase-ip>:<port>/raw?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
 ```
 
+[Contents](#contents)
+
 <h3 id="using-nutcase">Using NUTCase</h3>
 <h4 id="using-nutcase-prometheus">Prometheus</h4>
 To configure Prometheus to scrape NUTCase for metrics set up the following in your prometheus.yml file
 
-```
+```yaml
 # prometheus.yml
 global:
     scrape_interval: 10s
@@ -338,7 +345,7 @@ To configure HomePage to display information from NUTCase up the following in yo
 
 ![Screenshot of code](https://github.com/ArthurMitchell42/nutcase/blob/1211bd35a422d9c3e6bcf10cdf3be337acb43927/resources/homepage-code.jpg)
 
-```
+```yaml
 - UPS-Other:
     - DS9 UPS:
         href: http://10.0.10.9:9995/log?lines=40
@@ -386,13 +393,19 @@ This will give a display as follows
 
 You can customise which parameters of the UPS appear by selecting them from the JSON data supplied by the JSON end point, see above.
 
+[Contents](#contents)
+
 <h3 id="credits">Credits</h3>
 <p>
 Credit goes to the HON95 container upon which this is heavily based on.
 </p>
 
+[Contents](#contents)
+
 <h3 id="support">Support</h3>
 <p><b>If you find this container useful then please consider</b> <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8">buying me a coffee by following this link or scanning the QR below.</a> :smiley: :coffee:</p>
 
 <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8"> <img src="http://www.ajwm.uk/dockerdonate.jpg" alt="Please consider donating" width="120" height="120"> </a>
+
+[Contents](#contents)
 
