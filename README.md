@@ -20,27 +20,27 @@
 <h3 id="contents">Contents</h3>
   
 - [Introduction](#introduction)
-    - [Key features](#key-features)
-    - [Contents](#contents)
-    - [Links & References](#links-refs)
+  - [Key features](#key-features)
+  - [Contents](#contents)
+  - [Links & References](#links-refs)
 - [Supported Architectures](#architectures)
 - [History & Versions](#history)
 - [Preparation and Application Setup](#preparation)
-    - [Your UPS system](#preparation-system)
-    - [The NUTCase docker container](#preparation-docker)
+  - [Your UPS system](#preparation-system)
+  - [The NUTCase docker container](#preparation-docker)
 - [NUTCase Usage](#nutcase-useage)
-    - [Docker CLI](#nutcase-useage-docker-cli)
-    - [Docker Compose](#nutcase-useage-docker-comp)
+  - [Docker CLI](#nutcase-useage-docker-cli)
+  - [Docker Compose](#nutcase-useage-docker-comp)
 - [End-points to Access NUTCase](#endpoints)
-    - [Metrics & Text](#endpoints-metrics)
-    - [The JSON End-point](#endpoints-json)
-    - [Diagnosics](#endpoints-diag)
-        - [The log End-point](#endpoints-log)
-        - [The help End-point](#endpoints-help)
-        - [The raw End-point](#endpoints-raw)
+  - [Metrics & Text](#endpoints-metrics)
+  - [The JSON End-point](#endpoints-json)
+  - [Diagnosics](#endpoints-diag)
+    - [The log End-point](#endpoints-log)
+    - [The help End-point](#endpoints-help)
+    - [The raw End-point](#endpoints-raw)
 - [Using NUTCase](#using-nutcase)
-    - [Prometheus](#using-nutcase-prometheus)
-    - [HomePage](#using-nutcase-homepage)
+  - [Prometheus](#using-nutcase-prometheus)
+  - [HomePage](#using-nutcase-homepage)
 - [Parameters](#parameters)
 - [Credits](#credits)
 - [Support](#support)
@@ -53,9 +53,12 @@ The docker container:
 Source code:
 > https://github.com/ArthurMitchell42/nutcase
 
+The Wiki for usage information and advice:
+> https://github.com/ArthurMitchell42/nutcase/wiki
+
 <h3 id="architectures">Supported Architectures</h3>
 <p>
-Currently supports AMD64,ARM64 (ARM64V8) (suitable for running on docker under Raspberry PI with a 64-bit OS such as Raspberry PI OS 64-bit and Ubuntu 64-bit) & ARM32 V7 (armhf) (suitable for running on docker under Raspberry PI 32-bit OS)    
+Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker under Raspberry PI with a 64-bit OS such as Raspberry PI OS 64-bit and Ubuntu 64-bit) & 'ARM32 V7 (armhf)' (suitable for running on docker under Raspberry PI 32-bit OS)    
 <br>
 
 <table>
@@ -71,7 +74,7 @@ Currently supports AMD64,ARM64 (ARM64V8) (suitable for running on docker under R
 </tr>
 <tr>
 <td align="center">ARM32V7 (armhf 32-bit)</td>
-<td>latest-arm32v7 For Raspberry PI with a 32-bit OS</td>
+<td>latest-arm32v7 For Raspberry PI with a 32-bit OS :warning:</td>
 </tr>
 <tr>
 <td align="center">ARM64V8 (ARM64)</td>
@@ -81,6 +84,8 @@ Currently supports AMD64,ARM64 (ARM64V8) (suitable for running on docker under R
 
 > [!WARNING]
 > For security reasons, going forward I'll be focusing on 64-bit containers only.
+
+[Contents](#contents)
 
 <h3 id="history">History & Versions</h3>
 <table>
@@ -212,6 +217,8 @@ services:
 
 > [!NOTE]
 > The log files will rotate when the reach **250KB** and up to 5 versions will be kept with the extensions <i>.log.1, .log.2, .log.3, .log.4, .log.5</i>
+
+[Contents](#contents)
 
 <h3 id="parameters">Parameters</h3>
 <p>
