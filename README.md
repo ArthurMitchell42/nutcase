@@ -1,6 +1,6 @@
 <h1>NUTCase</h1>
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg?style=for-the-badge)](https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8)
+[<img src="https://img.shields.io/badge/paypal-donate-blue.svg?logo=paypal&style=for-the-badge">](https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8)
 [![Release](https://img.shields.io/github/release/ArthurMitchell42/nutcase.svg?logo=github&style=for-the-badge)](https://github.com/ArthurMitchell42/nutcase/releases/latest)
 [![Docker Image Size](https://img.shields.io/docker/image-size/kronos443/nutcase/latest?logo=docker&style=for-the-badge)](https://hub.docker.com/r/kronos443/nutcase/tags)
 [![Docker Pulls](https://img.shields.io/docker/pulls/kronos443/nutcase?label=Pulls&logo=docker&style=for-the-badge)](https://hub.docker.com/r/kronos443/nutcase)
