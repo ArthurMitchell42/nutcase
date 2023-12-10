@@ -10,9 +10,9 @@ jobs:
 
   build:
 
-    runs-on: python-alpine3.18
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker buildx --file Dockerfile --tag kronos443/nutcase:$(date +%s) --platform linux/amd64,linux/arm64/v8,linux/arm/v7 .
+      run: docker build --file Dockerfile --tag kronos443/nutcase:$(date +%s) .
