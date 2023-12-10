@@ -1,11 +1,11 @@
 #====================================================================================================
 # HTML Font & style strings
 #====================================================================================================
-Main_Font           = 'style="font-family: Arial, Helvetica, sans-serif;"'
-Lucida_Font         = 'style="font-family:Lucida Sans Unicode;"'
-Verdana_Font        = 'style="font-family:Verdana;"'
-Lucida_Console_Font = 'style="font-family:Lucida Console;"'
-Monospace_Font      = 'style="font-family:monospace;font-size:14px"'
+Main_Font             = 'style="font-family: Arial, Helvetica, sans-serif;"'
+Lucida_Font           = 'style="font-family:Lucida Sans Unicode;"'
+Verdana_Font          = 'style="font-family:Verdana;"'
+Lucida_Console_Font   = 'style="font-family:Lucida Console;"'
+Monospace_Font        = 'style="font-family:monospace;font-size:14px"'
 
 HTML_Colour_Blue      = 'style="color:Blue"'
 HTML_Colour_Yellow    = 'style="color:Gold"'
