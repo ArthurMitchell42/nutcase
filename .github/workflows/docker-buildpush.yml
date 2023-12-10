@@ -2,8 +2,8 @@ name: Docker Image build and push
 
 on:
   push:
-#    branches: 
-#      - main
+    branches: 
+      - main
     tags: [ "*" ]
 #  label:
 #    branches: [ "main" ]
@@ -33,5 +33,4 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build the Docker image
-      run: docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 --file Dockerfile --tag kronos443/nutcase:$(date +'%Y-%m-%d_%H-%M-%S') --push .
-
+      run: docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 --file Dockerfile --tag kronos443/nutcase:$GITHUB_REF_NAME-$(date +'%Y-%m-%d_%H-%M-%S') --push .
