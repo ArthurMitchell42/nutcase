@@ -132,11 +132,11 @@ def Query_APC_NIS_Socket(Target_Address, Target_Port, Command):
         Skt.connect( (Target_Address, Target_Port) )
         Skt.send( Packet )
         time.sleep(5.0)
-        Data = Skt.recv(4096)
+        Data = Skt.recv(4096 * 2)
         if len(Data) == 2:
             log.debug( 'Short data so retying' ) 
             time.sleep(1.0)
-            Data2 = Skt.recv(4096)
+            Data2 = Skt.recv(4096 * 2)
             c = "2s{}s".format( len(Data2) )
             Data = pack(c, Data, Data2)
 

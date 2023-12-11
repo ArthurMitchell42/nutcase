@@ -7,10 +7,10 @@ import json                      # For returning JSON structures
 log = logging.getLogger('__main__.' + __name__)
 
 #====================================================================================================
-# Format_To_JSON
-# Main function to return JSON data
+# Format_For_JSON
+# Main function to return a dictionary suitable for turning in to JSON data
 #====================================================================================================
-def Format_To_JSON( Scrape_Data ):
+def Format_For_JSON( Scrape_Data ):
     log.debug("In Format_To_JSON. Scrape_Data is:\n{}".format( Scrape_Data ))
 
     Output_Dict = {}
@@ -32,6 +32,5 @@ def Format_To_JSON( Scrape_Data ):
                 Output_Dict[ ups["name"] ]["clients" ]["count"] = len(ups["clients"])
                 Output_Dict[ ups["name"] ]["clients" ]["list"] = ups["clients"]
 
-    log.debug("Output_Dict: \n{}".format(Output_Dict))
-    Formatted_JSON_Text = json.dumps(Output_Dict)
-    return Formatted_JSON_Text
+    log.debug("Output_Dict:\n{}".format(Output_Dict))
+    return Output_Dict

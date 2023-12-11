@@ -62,7 +62,7 @@ def Query_NUT_UPS_Clients( Socket_File, UPSs, Debug_Lines ):
     for ups in UPSs:
         log.debug( "Listing client devices for UPS {}".format(ups["name"]) )
         Request = b"LIST CLIENT " + ups["name"].encode()
-
+        Debug_Lines.append(Request.decode())
         log.debug( "Command: {}".format(Request) ) 
         Socket_File.write(Request + b"\n")
 
@@ -71,14 +71,12 @@ def Query_NUT_UPS_Clients( Socket_File, UPSs, Debug_Lines ):
         if not rtn:
             log.warning( "Problem encountered listing variables of UPS: {}".format(ups["name"]) )
             return False
-
     return True
 
 #=======================================================================
 # Read server respose
 #=======================================================================
 def Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines ):
-
     Begin_Pattern       = re.compile("^BEGIN " + Request.decode() + "$")
     End_Pattern         = re.compile("^END " + Request.decode() + "$")
     Error_Pattern       = re.compile("^ERR (.+)$")
@@ -116,7 +114,6 @@ def Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines ):
                         var_match = re.search( VAR_Pattern, Line )
                         client_match = re.search( UPS_Client_Pattern, Line )
                         if ups_match:
-                            # log.debug( "UPS match" )
                             UPS = { 
                                 "name": ups_match.group(1),
                                 "description": ups_match.group(2).strip("\""),
@@ -129,10 +126,8 @@ def Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines ):
                                 "name": var_match.group(2),
                                 "value": var_match.group(3).strip("\"")
                             }
-                            # log.debug( "VAR match {} for UPS {}".format( VAR, var_match.group(1) ) )
 
                             for i in UPSs:
-                                # log.debug( "Found UPS {}".format( i ) )
                                 if i["name"] == var_match.group(1):
                                     # log.debug( "Found UPS {} for VAR {}".format( var_match.group(1), var_match.group(2) ) )
                                     i["variables"].append(VAR)
@@ -144,7 +139,6 @@ def Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines ):
                             log.debug( "Client match {} for UPS {}".format( Client["client"], Client["upsname"] ) )
 
                             for i in UPSs:
-                                # log.debug( "Found UPS {}".format( i ) )
                                 if i["name"] == client_match.group(1):
                                     # log.debug( "Found UPS {} for VAR {}".format( var_match.group(1), var_match.group(2) ) )
                                     i["clients"].append(Client["client"])
@@ -187,7 +181,6 @@ def Query_NUT_UPSs( Socket_File, UPSs, Debug_Lines ):
 #=======================================================================
 def Query_NUT_Variables( Socket_File, UPSs, Debug_Lines ):
     for ups in UPSs:
-        # Debug_Lines = []
         log.debug( "Listing variables for UPS {}".format(ups["name"]) )
 
         Request = b"LIST VAR " + ups["name"].encode()
@@ -196,11 +189,9 @@ def Query_NUT_Variables( Socket_File, UPSs, Debug_Lines ):
         Socket_File.write(Request + b"\n")
 
         rtn = Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines )
-        # ups["debug"] = Debug_Lines
         if not rtn:
             log.warning( "Problem encountered listing variables of UPS: {}".format(ups["name"]) )
             return False
-         
     return True
 
 #=======================================================================

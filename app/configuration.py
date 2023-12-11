@@ -16,7 +16,6 @@ log = logging.getLogger('__main__.' + __name__)
 def List_Variables( Config ):
     Var_List = []
     for Rework in Config['rework']:
-        log.debug("Listing variables to rework: {}".format( Rework["from"] ))
         if Rework["from"] not in Var_List:
             Var_List.append( Rework["from"] )
 
@@ -47,7 +46,7 @@ def Parse_Config( Config ):
     for Section in Config:
         try:
             assert Section in Sections
-            log.debug("Section {} found".format( Section ) )
+            # log.debug("Section {} found".format( Section ) )
         except AssertionError:
             log.error("Unknown section type {}".format( Section ))
             return False
@@ -115,9 +114,9 @@ def Load_Config():
     # Load the YAML and convert to a dictionary
     #=================================================================================
     try:
-        with open(Config_File, "r") as Config_File:
+        with open(Config_File, "r") as Config_File_Handle:
             try:
-                Config = yaml.safe_load( Config_File )
+                Config = yaml.safe_load( Config_File_Handle )
                 log.info("Loaded Control_YAML from {}".format( Config_File ))
                 log.debug("Control_YAML:\n{}".format( Config ))
             except yaml.YAMLError as Error:
