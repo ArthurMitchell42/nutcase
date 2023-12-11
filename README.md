@@ -145,9 +145,11 @@ To setup the NUTCase docker container:
 [Contents](#contents)
 
 <h3 id="nutcase-useage">NUTCase Usage</h3>
-<p>
+
+For details on useage please see [Running the NUTCase container](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container). 
+
 Create you container locally by either:
-<br>
+
 <h4 id="nutcase-useage-docker-cli">Docker CLI</h4>
 
 ```shell
@@ -174,7 +176,6 @@ services:
     image: kronos443/nutcase:latest
     container_name: NUTCase
     restart: always  # always or unless-stopped    
-    user: "$PUID:$PGID"
     ports:
       - "$NUTEXPORT_PORT:9995"
     volumes:
@@ -185,39 +186,6 @@ services:
 
 > [!TIP]
 > To help disgnostics and see what information the server is returning about the UPS you can use optional variables such as LOG_LEVEL.
-
-```yaml
----
-version: '3.9'
-services:
-  nutcase:
-    image: kronos443/nutcase:latest
-    container_name: NUTCase
-    restart: always  # always or unless-stopped    
-    user: "$PUID:$PGID"
-    ports:
-      - "$NUTEXPORT_PORT:9995"
-    volumes:
-      - '$DOCKER_DIR/nutcase:/config'
-    environment:
-      TZ: $TZ
-      # LOG_LEVEL - DEBUG INFO WARNING ERROR CRITICAL & FATAL are the options
-      LOG_LEVEL: INFO  
-      LOG_REQUESTS_DEBUG: False
-      LOG_FILE=your-file-name.log
-      ENV LOG_REQUESTS: True
-      LOG_REQUESTS_DEBUG: False
-      ORDER_METRICS: True
-    healthcheck:
-      test: wget --spider -q  http://localhost:$NUTEXPORT_PORT/help
-      interval: 3m30s
-      timeout: 10s
-      retries: 2
-      start_period: 30s
-```
-
-> [!NOTE]
-> The log files will rotate when the reach **250KB** and up to 5 versions will be kept with the extensions <i>.log.1, .log.2, .log.3, .log.4, .log.5</i>
 
 [Contents](#contents)
 
