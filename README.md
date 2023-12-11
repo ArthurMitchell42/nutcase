@@ -10,12 +10,13 @@
 
 ### V0.2.0 Beta is ready for download with [new features](https://github.com/ArthurMitchell42/nutcase/discussions/5)
 
-<h2 id="introduction">A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h2>
+<h2 id="introduction">A Network UPS Tools (NUT) and APC daemon exporter to pass data to Prometheus and any JSON compatible applications</h2>
 <h3 id="key-features">Key features</h3>
 <h4>
 <ul>
-  <li>Supports pulling data from a NUT server and formatting the UPS status for the <a href="https://prometheus.io/">Prometheus</a> logging system</li>
-  <li>Supports formatting the UPS status as JSON for use with the beautiful <a href="https://gethomepage.dev">HomePage</a> app.</li>
+  <li>Supports pulling data from a NUT server and formatting the UPS status for the <a href="https://prometheus.io/">Prometheus</a> logging system</li> as text
+  <li>Supports pulling data from both <b>NUT and APC daemon servers</b> and formatting the UPS status to JSON</li>
+  <li>JSON formatting is compatible with the beautiful <a href="https://gethomepage.dev">HomePage</a> app.</li>
   <li>The JSON output can be used with <a href="https://github.com/louislam/uptime-kuma">Uptime Kuma</a> and other reporting, alarming and monitoring apps.</li>
   <li>Provides diagnostic information and usage information.</li>
 </ul>
