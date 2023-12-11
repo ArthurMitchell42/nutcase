@@ -8,6 +8,8 @@
 [![Docker Build](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml)
 [![Docker build and push](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml)
 
+### V0.2.0 Beta is ready for download with [new features](https://github.com/ArthurMitchell42/nutcase/discussions/5)
+
 <h2 id="introduction">A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h2>
 <h3 id="key-features">Key features</h3>
 <h4>
