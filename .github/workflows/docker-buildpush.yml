@@ -1,4 +1,4 @@
-name: Docker Image build and push
+name: Docker build and push tag
 
 on:
   push:
