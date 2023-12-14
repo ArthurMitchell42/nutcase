@@ -1,11 +1,11 @@
 import logging
-from enum import Enum
 
 import globals
 import metric_data
 
-from nutcase import Order_Metrics
-
+#=======================================================================
+# Connect to the app log
+#=======================================================================
 log = logging.getLogger('__main__.' + __name__)
 
 #=======================================================================
@@ -72,10 +72,8 @@ def Format_UPS_Info_Metric( Metric, ups ):
 
     Labels = ""
     for Entry in UPS_Info_List:
-        # print("Get variable {} for Label {}".format(Entry["variable"], Entry["label"]))
         Variable_Value = Get_NUT_Variable(ups, Entry["variable"])
         if Variable_Value:
-            # print("Adding label {} with value {}".format(Entry["label"], Variable_Value ))
             Labels += "," + Entry["label"] + "=\"" + Variable_Value + "\""
 
     Data["data"] = [ "{metric}{{ups=\"{name}\",description=\"{ups_desc}\"{labels}}} 1".format(  metric=Metric["metric"], name=ups["name"], ups_desc=ups["description"], labels=Labels ) ]
@@ -190,9 +188,8 @@ def Format_For_Prometheus( Scrape_Data ):
                     Entry = Format_Variable_Metric( Metric, ups["name"], NUT_Variable )
                     if Entry: Metric_List.append( Entry )
 
-    # print("Metric_List:\n{}".format( Metric_List ))
     Formatted_Text = ""
-    if Order_Metrics:
+    if globals.Order_Metrics:
         #==============================================================================
         # Print the data for each metric to a list of lines in a given display order
         #==============================================================================

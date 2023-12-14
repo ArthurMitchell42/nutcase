@@ -5,6 +5,12 @@ import socket
 
 from enum import Enum
 
+import rework_data
+import globals
+
+#=======================================================================
+# Connect to the app log
+#=======================================================================
 log = logging.getLogger('__main__.' + __name__)
 
 #=======================================================================
@@ -50,15 +56,33 @@ def Query_NUT_Version( Socket, Socket_File, Debug_Lines ):
     return True, NUT_Version
 
 #=======================================================================
+# Query_NUT_UPS_Clients
+#=======================================================================
+def Query_NUT_UPS_Clients( Socket_File, UPSs, Debug_Lines ):
+    for ups in UPSs:
+        log.debug( "Listing client devices for UPS {}".format(ups["name"]) )
+        Request = b"LIST CLIENT " + ups["name"].encode()
+        Debug_Lines.append(Request.decode())
+        log.debug( "Command: {}".format(Request) ) 
+        Socket_File.write(Request + b"\n")
+
+        rtn = Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines )
+
+        if not rtn:
+            log.warning( "Problem encountered listing variables of UPS: {}".format(ups["name"]) )
+            return False
+    return True
+
+#=======================================================================
 # Read server respose
 #=======================================================================
 def Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines ):
-
-    Begin_Pattern = re.compile("^BEGIN " + Request.decode() + "$")
-    End_Pattern = re.compile("^END " + Request.decode() + "$")
-    Error_Pattern = re.compile("^ERR (.+)$")
-    UPS_Pattern = re.compile('^UPS (.+?) (.*)$')
-    VAR_Pattern = re.compile('^VAR (.+?) (.+?) (.*)$')
+    Begin_Pattern       = re.compile("^BEGIN " + Request.decode() + "$")
+    End_Pattern         = re.compile("^END " + Request.decode() + "$")
+    Error_Pattern       = re.compile("^ERR (.+)$")
+    UPS_Pattern         = re.compile('^UPS (.+?) (.*)$')
+    VAR_Pattern         = re.compile('^VAR (.+?) (.+?) (.*)$')
+    UPS_Client_Pattern  = re.compile('^CLIENT (.+?) (.*)$')
 
     List_State = NUT_Query_List_State.INITIAL
 
@@ -67,7 +91,6 @@ def Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines ):
             Line = Socket_File.readline().decode()
             if Line[-1] == "\n":
                 Line = Line[:-1]
-            log.debug( "Line from server: {}".format(Line) ) 
             Debug_Lines.append(Line)
 
             if re.search( Error_Pattern, Line ):
@@ -89,12 +112,13 @@ def Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines ):
                     else: # => NUT_Query_List_State.STARTED
                         ups_match = re.search( UPS_Pattern, Line )
                         var_match = re.search( VAR_Pattern, Line )
+                        client_match = re.search( UPS_Client_Pattern, Line )
                         if ups_match:
-                            log.debug( "UPS match" )
                             UPS = { 
                                 "name": ups_match.group(1),
                                 "description": ups_match.group(2).strip("\""),
-                                "variables": []
+                                "variables": [],
+                                "clients": []
                             }
                             UPSs.append( UPS )
                         elif var_match:
@@ -102,13 +126,22 @@ def Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines ):
                                 "name": var_match.group(2),
                                 "value": var_match.group(3).strip("\"")
                             }
-                            log.debug( "VAR match {} for UPS {}".format( VAR, var_match.group(1) ) )
 
                             for i in UPSs:
-                                # log.debug( "Found UPS {}".format( i ) )
                                 if i["name"] == var_match.group(1):
                                     # log.debug( "Found UPS {} for VAR {}".format( var_match.group(1), var_match.group(2) ) )
                                     i["variables"].append(VAR)
+                        elif client_match:
+                            Client = {
+                                "upsname": client_match.group(1),
+                                "client": client_match.group(2)
+                            }
+                            log.debug( "Client match {} for UPS {}".format( Client["client"], Client["upsname"] ) )
+
+                            for i in UPSs:
+                                if i["name"] == client_match.group(1):
+                                    # log.debug( "Found UPS {} for VAR {}".format( var_match.group(1), var_match.group(2) ) )
+                                    i["clients"].append(Client["client"])
                         else:
                             List_State = NUT_Query_List_State.MALFORMED
                             break
@@ -146,9 +179,8 @@ def Query_NUT_UPSs( Socket_File, UPSs, Debug_Lines ):
 #=======================================================================
 # Query_NUT_Variables
 #=======================================================================
-def Query_NUT_Variables( Socket_File, UPSs ):
+def Query_NUT_Variables( Socket_File, UPSs, Debug_Lines ):
     for ups in UPSs:
-        Debug_Lines = []
         log.debug( "Listing variables for UPS {}".format(ups["name"]) )
 
         Request = b"LIST VAR " + ups["name"].encode()
@@ -157,37 +189,43 @@ def Query_NUT_Variables( Socket_File, UPSs ):
         Socket_File.write(Request + b"\n")
 
         rtn = Parse_Server_Response( Socket_File, Request, UPSs, Debug_Lines )
-        ups["debug"] = Debug_Lines
         if not rtn:
             log.warning( "Problem encountered listing variables of UPS: {}".format(ups["name"]) )
             return False
-         
     return True
 
 #=======================================================================
-# Connect_To_Server
+# Connect_To_NUT_Server
 #=======================================================================
-def Connect_To_Server(Target_Address, Target_Port):
-    
-    Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    Socket.settimeout(2)
+def Connect_To_NUT_Server(Target_Address, Target_Port):
+    #===================================================================
+    # Open a socket to the server
+    #===================================================================
+    Skt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    Skt.settimeout(2)
 
     try:
-        Socket.connect((Target_Address, Target_Port))
+        Skt.connect((Target_Address, Target_Port))
     except Exception as Error:
-        log.error( 'Unable to connect to server: {}'.format(Error) ) 
+        log.error( 'Unable to connect to NUT server: {}'.format(Error) ) 
         return False, []
 
-    File_Handle = Socket.makefile("rbw", buffering=0)
+    #===================================================================
+    # Make a virtual file from the socket to enable reading lines
+    #===================================================================
+    File_Handle = Skt.makefile("rbw", buffering=0)
 
     Server_Debug_Lines = []
-    rtn, NUT_Version = Query_NUT_Version( Socket, File_Handle, Server_Debug_Lines )
+    rtn, NUT_Version = Query_NUT_Version( Skt, File_Handle, Server_Debug_Lines )
     if rtn:
         log.debug( "NUT Version: {}".format( NUT_Version ) ) 
     else:
         log.error( "Scrape abandoned while reading version." )
         return False, []
 
+    #===================================================================
+    # Read the list of UPS devices being served
+    #===================================================================
     UPSs = []
     rtn = Query_NUT_UPSs( File_Handle, UPSs, Server_Debug_Lines )
     if rtn:
@@ -196,15 +234,25 @@ def Connect_To_Server(Target_Address, Target_Port):
         log.error( "Scrape abandoned while listing UPS's." )
         return False, []
  
-    rtn = Query_NUT_Variables( File_Handle, UPSs )
+    #===================================================================
+    # Get all the variables for all listed UPS devices
+    #===================================================================
+    rtn = Query_NUT_Variables( File_Handle, UPSs, Server_Debug_Lines )
     if not rtn:
         log.error( "Scrape abandoned while listing variables." )
-        Socket.close()
+        Skt.close()
         log.debug( "Connection to server closed" ) 
         return False, []
 
+    #===================================================================
+    # Get the client machines for all listed UPS devices
+    #===================================================================
+    rtn = Query_NUT_UPS_Clients( File_Handle, UPSs, Server_Debug_Lines )
+    if not rtn:
+        log.debug( "Scrape of client list failed." )
+
     log.debug( "NUT_UPSs: {}".format( UPSs ) )
-    Socket.close()
+    Skt.close()
     log.debug( "Connection to server closed" ) 
 
     Scrape_Data = {}
@@ -217,14 +265,21 @@ def Connect_To_Server(Target_Address, Target_Port):
     return True, Scrape_Data
 
 #=======================================================================
-# Scrape entry point: Scrape_Server
+# Scrape entry point: Scrape_NUT_Server
 #=======================================================================
-def Scrape_Server( Target_Address, Target_Port = 3493 ):
-    log.debug( "Scrape started of address %s, port %s" % (Target_Address, Target_Port) ) 
+def Scrape_NUT_Server( Target_Address, Target_Port = 3493 ):
+    log.debug("Scrape started of NUT server, address %s, port %s" % (Target_Address, Target_Port) ) 
+    log.debug("Scrape_NUT_Server: Config in use: {}".format( globals.Config ))
 
-    Status, Scrape_Data = Connect_To_Server(Target_Address, Target_Port)
+    Status, Scrape_Data = Connect_To_NUT_Server(Target_Address, Target_Port)
     if Status:
         log.debug( "Scrape successful." ) 
+        if globals.Config:
+            log.debug( "Reworking variables." ) 
+            rework_data.Rework_Variables( Scrape_Data, globals.Config )
+        else:
+            log.debug( "Not reworking variables." ) 
+
         # with open('./scrap/scrape_data.pickle', 'wb') as handle:
         #     pickle.dump(Scrape_Data, handle, protocol=pickle.HIGHEST_PROTOCOL)
     else:
