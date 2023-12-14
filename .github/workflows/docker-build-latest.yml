@@ -1,13 +1,7 @@
-name: Docker build and push tag
+name: Docker build latest and push
 
 on:
-  push:
-#    branches: 
-#      - main
-#      - V0.2*
-    tags: [ "*" ]
-#  label:
-#    branches: [ "main" ]
+  workflow_dispatch
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -34,5 +28,4 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build the Docker image
-      run: docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 --file Dockerfile --tag kronos443/nutcase:$GITHUB_REF_NAME --push .
-
+      run: docker buildx build --platform linux/amd64,linux/arm64/v8,linux/arm/v7 --file Dockerfile --tag ${{ env.IMAGE_NAME }}:latest --push .

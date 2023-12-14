@@ -8,16 +8,27 @@
 [![Docker Build](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml)
 [![Docker build and push](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml)
 
-<h2 id="introduction">A Network UPS Tools (NUT) exporter to pass data to Prometheus and any JSON compatible application.</h2>
+### V0.2.0 Beta is ready for download with [new features](https://github.com/ArthurMitchell42/nutcase/discussions/5)
+
+<h2 id="introduction">A Network UPS Tools (NUT) and APC daemon exporter to pass data to Prometheus and any JSON compatible applications</h2>
 <h3 id="key-features">Key features</h3>
 <h4>
 <ul>
-  <li>Supports pulling data from a NUT server and formatting the UPS status for the <a href="https://prometheus.io/">Prometheus</a> logging system</li>
-  <li>Supports formatting the UPS status as JSON for use with the beautiful <a href="https://gethomepage.dev">HomePage</a> app.</li>
+  <li>Supports pulling data from a NUT server and formatting the UPS status for the <a href="https://prometheus.io/">Prometheus</a> logging system</li> as text
+  <li>Supports pulling data from both <b>NUT and APC daemon servers</b> and formatting the UPS status to JSON</li>
+  <li>JSON formatting is compatible with the beautiful <a href="https://gethomepage.dev">HomePage</a> app.</li>
   <li>The JSON output can be used with <a href="https://github.com/louislam/uptime-kuma">Uptime Kuma</a> and other reporting, alarming and monitoring apps.</li>
   <li>Provides diagnostic information and usage information.</li>
 </ul>
 </h4>
+
+### How It Works
+
+![Structure](https://github.com/ArthurMitchell42/nutcase/blob/b876b3b442a71d8cb97717b3b64f06327a6dca73/resources/structure.png)
+
+NUTCase sits between any nuber of UPS servers, either NUT or APC, and converts the UPS parameters in to either text metrics suitable for use with data caputre systems like Prometheus or JSON.
+The JSON is ideal for monitoring or display on dashboard systems such as HomePage.
+
 <h3 id="contents">Contents</h3>
   
 - [Introduction](#introduction)
@@ -145,9 +156,11 @@ To setup the NUTCase docker container:
 [Contents](#contents)
 
 <h3 id="nutcase-useage">NUTCase Usage</h3>
-<p>
+
+For details on useage please see [Running the NUTCase container](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container). 
+
 Create you container locally by either:
-<br>
+
 <h4 id="nutcase-useage-docker-cli">Docker CLI</h4>
 
 ```shell
@@ -174,7 +187,6 @@ services:
     image: kronos443/nutcase:latest
     container_name: NUTCase
     restart: always  # always or unless-stopped    
-    user: "$PUID:$PGID"
     ports:
       - "$NUTEXPORT_PORT:9995"
     volumes:
@@ -185,39 +197,6 @@ services:
 
 > [!TIP]
 > To help disgnostics and see what information the server is returning about the UPS you can use optional variables such as LOG_LEVEL.
-
-```yaml
----
-version: '3.9'
-services:
-  nutcase:
-    image: kronos443/nutcase:latest
-    container_name: NUTCase
-    restart: always  # always or unless-stopped    
-    user: "$PUID:$PGID"
-    ports:
-      - "$NUTEXPORT_PORT:9995"
-    volumes:
-      - '$DOCKER_DIR/nutcase:/config'
-    environment:
-      TZ: $TZ
-      # LOG_LEVEL - DEBUG INFO WARNING ERROR CRITICAL & FATAL are the options
-      LOG_LEVEL: INFO  
-      LOG_REQUESTS_DEBUG: False
-      LOG_FILE=your-file-name.log
-      ENV LOG_REQUESTS: True
-      LOG_REQUESTS_DEBUG: False
-      ORDER_METRICS: True
-    healthcheck:
-      test: wget --spider -q  http://localhost:$NUTEXPORT_PORT/help
-      interval: 3m30s
-      timeout: 10s
-      retries: 2
-      start_period: 30s
-```
-
-> [!NOTE]
-> The log files will rotate when the reach **250KB** and up to 5 versions will be kept with the extensions <i>.log.1, .log.2, .log.3, .log.4, .log.5</i>
 
 [Contents](#contents)
 
