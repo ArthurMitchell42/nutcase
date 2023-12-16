@@ -19,7 +19,7 @@ import configuration
 # Set up logging objects and logging to a file and the console
 #==================================================================================================
 def Configure_Log(log):
-    try:              log.setLevel( os.environ.get('LOG_LEVEL', "DEBUG").upper() )
+    try:              log.setLevel( os.environ.get('LOG_LEVEL', "INFO").upper() )
     except Exception: log.setLevel( logging.DEBUG )
 
     Log_Console_Handler = logging.StreamHandler()
