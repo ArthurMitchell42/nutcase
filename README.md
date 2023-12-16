@@ -8,7 +8,7 @@
 [![Docker Build](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml)
 [![Docker build and push](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml)
 
-### V0.2.0 Beta is ready for download with [new features](https://github.com/ArthurMitchell42/nutcase/discussions/5)
+### News: V0.2.0 is released
 
 <h2 id="introduction">A Network UPS Tools (NUT) and APC daemon exporter to pass data to Prometheus and any JSON compatible applications</h2>
 <h3 id="key-features">Key features</h3>
@@ -108,6 +108,11 @@ Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker un
 </tr>
 </thead>
 <tbody>
+<tr>
+<td align="left">16/12/2023</td>
+<td align="left">0.2.0</td>
+<td align="left">APC Support with other features, See GitHub notes.</td>
+</tr>
 <tr>
 <td align="left">01/12/2023</td>
 <td align="left">0.1.0</td>
