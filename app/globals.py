@@ -1,7 +1,7 @@
 #==============================================================
 # Global declarations for information used in multiple modules
 #==============================================================
-App_Version         = "0.2.0 Beta 4"
+App_Version         = "0.2.0"
 Config              = None
 Config_Path         = str
 Log_File            = str
