@@ -109,6 +109,11 @@ Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker un
 </thead>
 <tbody>
 <tr>
+<td align="left">22/12/2023</td>
+<td align="left">0.2.1</td>
+<td align="left">Corrected error relating to the query port command.</td>
+</tr>
+<tr>
 <td align="left">16/12/2023</td>
 <td align="left">0.2.0</td>
 <td align="left">APC Support with other features, See GitHub notes.</td>

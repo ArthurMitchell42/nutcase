@@ -280,7 +280,7 @@ class NUTCaseServer(BaseHTTPRequestHandler):
                 #====================================================================================
                 Target_Resolved, Target_Address, Parameter_Port = Resolve_Address_And_Port( URL_Parameters )
                 if Parameter_Port:
-                    Target_Port = Parameter_Port
+                    Target_Port = int(Parameter_Port)
  
                 if not Target_Resolved:
                     Lines = [ "<pre>Target address not resolved: <b>{}</b></pre>".format( URL_Parameters ) ]
