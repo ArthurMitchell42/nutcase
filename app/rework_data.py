@@ -73,7 +73,10 @@ def Transform_Composite_Enum( Var, Rework ):
 def Transform_Ratio( Var, Rework, UPS ):
     New_Var = {"name": Rework["to"], "value": ""}
 
-    Nominal_Power = int( Get_NUT_Variable( UPS, Rework["control"] ) )
+    if Nominal_Power := Get_NUT_Variable( UPS, Rework["control"] ):
+        Nominal_Power = int( float(Nominal_Power) )
+    else:
+        Nominal_Power = 0
     Percent_Power = int( Var["value"] )
 
     Ratio = Nominal_Power * (Percent_Power/100)
