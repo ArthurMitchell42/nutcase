@@ -24,7 +24,7 @@
 
 ### How It Works
 
-![Structure](https://github.com/ArthurMitchell42/nutcase/blob/b876b3b442a71d8cb97717b3b64f06327a6dca73/resources/structure.png)
+![Structure](https://github.com/ArthurMitchell42/nutcase/blob/d0369f6ca10f76816cfa317785bf40dd2288cc6a/resources/structure.png)
 
 NUTCase sits between any nuber of UPS servers, either NUT or APC, and converts the UPS parameters in to either text metrics suitable for use with data caputre systems like Prometheus or JSON.
 The JSON is ideal for monitoring or display on dashboard systems such as HomePage.
