@@ -175,45 +175,6 @@ To setup the NUTCase docker container:
 
 For details on useage please see [Running the NUTCase container](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container). 
 
-Create you container locally by either:
-
-<h4 id="nutcase-useage-docker-cli">Docker CLI</h4>
-
-```shell
-docker run -d \
-        --name NUTCase \
-        -v /path/to/config:/config \
-        -e TZ=Europe/London  \
-        -p 9995:9995 \
-        --restart always \
-        kronos443/nutcase:latest
-```
-
-<h4 id="nutcase-useage-docker-comp">Docker Compose</h4>
-The minimal configuration:<br>
-
-> [!TIP]
-> This assumes you have set the appropriate variables for docker compose
-
-```yaml
----
-version: '3.9'
-services:
-  nutcase:
-    image: kronos443/nutcase:latest
-    container_name: NUTCase
-    restart: always  # always or unless-stopped    
-    ports:
-      - "$NUTEXPORT_PORT:9995"
-    volumes:
-      - '$DOCKER_DIR/nutcase:/config'
-    environment:
-      TZ: $TZ
-```
-
-> [!TIP]
-> To help disgnostics and see what information the server is returning about the UPS you can use optional variables such as LOG_LEVEL.
-
 [Contents](#contents)
 
 <h3 id="parameters">Parameters</h3>
