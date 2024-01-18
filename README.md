@@ -156,6 +156,8 @@ and typing <code>VER</code> at the command line followed by <code>LIST UPS</code
 ```
 This example output is from a Synology DSM 7.1 NAS. The name `ups` is not configurable and neither is the decsription [^1]
 
+See [Diagnosing Connection Issues](https://github.com/ArthurMitchell42/nutcase/wiki/Diagnosing-Connection-Issues) to set up an diagnose connection issues.
+
 > [^1]: <i>without SSH'ing into the system and editing config files.</i>
 
 > [!IMPORTANT]
@@ -179,183 +181,22 @@ For details on useage please see [Running the NUTCase container](https://github.
 
 <h3 id="parameters">Parameters</h3>
 <p>
-The parameters available are as follows:
-
-> [!IMPORTANT]
-> When setting the LOG_LEVEL to DEBUG you may find that the log fills up quite quickly. I suggest to only use this level during set up diagnosing connectivity issues
-
-<br>
-<table>
-<thead>
-<tr><th align="center">Parameter</th>
-<th>Function</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><b>Volume mapping</b><br>/path/to/config:/config</td>
-<td>The directory on your host that is shared with the container. The log file will be generated here.<br><i><b>Required</b></i></td>
-</tr>
-<tr>
-<td align="left"><b>Environment variable</b><br>LOG_FILE</td>
-<td>Changes the name of the logfile.<br><i><b>Optional</b></i> <i>Default: NUTCase.log</i></td>
-</tr>
-<tr>
-<td align="left"><b>Environment variable</b><br>LOG_REQUESTS</td>
-<td>Controls whether each HTTP request to NUTCase is recorded in the logfile.<br><i><b>Optional</b></i> <i>Options: true false - Default: true</i></td>
-</tr>
-<tr>
-<td align="left"><b>Environment variable</b><br>LOG_REQUESTS_DEBUG</td>
-<td>Controls whether details of each HTTP request to NUTCase is recorded in the logfile. This can be verbose and is intended for detailed investigations only.<br><i><b>Optional</b></i> <i>Options: true false - Default: false</i></td>
-</tr>
-<tr>
-<td align="left"><b>Environment variable</b><br>ORDER_METRICS</td>
-<td>Controls whether the metrics are reported in the same order as the HON95 container send them to Prometheus. Otherwise the variables are reported in the order the server sends them.<br><i><b>Optional</b></i> <i>Options: true false - Default: true</i></td>
-</tr>
-<tr>
-<td align="left"><b>Environment variable</b><br>PORT</td>
-<td>Sets the port that NUTCase binds to. This is generally only required if you set the container network mode to ***host*** since in bridge mode the port mapping controls which port is mapped.<br><i><b>Optional</b></i> <i>Default: 9995</i></td>
-</tr>
-</tr>
-<td align="left"><b>Environment variable</b><br>TZ</td>
-<td>Time zone, e.g. Europe/London.<br><i><b>Optional</b></i> but specifying this means the log times will be in the local timezone rather than UT</td>
-</tr>
-</tbody></table>
-</p>
+The parameters available are documented in [Running the NUTCase container](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container)
 
 [Contents](#contents)
 
 <h3 id="endpoints">End-points to Access NUTCase</h3>
-<h4 id="endpoints-metrics">Metrics & Text</h4>
-The metrics end point returns data suitable for Prometheus. If called from a browser then plain text is returned.
-Calling this end-point usually uses the _target_ parameter as this is the usual method used by Prometheus. However it can also be called with _addr_ and _port_.
-Examples are:
 
-```
-http://<nutcase-ip>:<port>/metrics?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
-http://<nutcase-ip>:<port>/metrics?target=A.B.C.D:P    Specifying the address of the server and the port.
-http://<nutcase-ip>:<port>/metrics?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
-```
-
-<h4 id="endpoints-json">The JSON End-point</h4>
-The JSON end point returns JSON data suitable for HomePage or any app that can use the formatted JSON data.
-Calling this end-point can use the _target_ parameter or the _addr_ and _port_ parameters.
-Examples are:
-
-```
-http://<nutcase-ip>:<port>/json?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
-http://<nutcase-ip>:<port>/json?target=A.B.C.D:P    Specifying the address of the server and the port.
-http://<nutcase-ip>:<port>/json?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
-```
-[Contents](#contents)
-
-<h3 id="endpoints-diag">Diagnostics</h3>
-<h4 id="endpoints-log">The log End-point</h4>
-The log end point returns a list of the last 20, or other requested number, of lines from the log file to speed diagnostics.
-
-```
-http://<nutcase-ip>:<port>/log           View the last 20 lines of the log file.
-http://<nutcase-ip>:<port>/log?lines=30  Optionally view a given number of last lines of the log file.
-```
-
-<h4 id="endpoints-help">The help End-point</h4>
-The help end point returns basic usage information and advice.
-
-```
-http://<nutcase-ip>:<port>/help
-```
-
-<h4 id="endpoints-raw">The raw End-point</h4>
-The raw end point returns JSON data with extra diagnostic information and is intended for support and debugging.
-
-```
-http://<nutcase-ip>:<port>/raw?target=A.B.C.D      Specifying the address of the server, assuming the default port, 3493.
-http://<nutcase-ip>:<port>/raw?target=A.B.C.D:P    Specifying the address of the server and the port.
-http://<nutcase-ip>:<port>/raw?addr=A.B.C.D&port=P Specifying the address of the server and the port (P).
-```
+Please see [Accessing and Using NUTCase](https://github.com/ArthurMitchell42/nutcase/wiki/Accessing-and-Using-NUTCase)
 
 [Contents](#contents)
 
 <h3 id="using-nutcase">Using NUTCase</h3>
-<h4 id="using-nutcase-prometheus">Prometheus</h4>
-To configure Prometheus to scrape NUTCase for metrics set up the following in your prometheus.yml file
 
-```yaml
-# prometheus.yml
-global:
-    scrape_interval: 10s
-scrape_configs:
-    - job_name: 'nut'
-      scrape_interval: 30s
-      scrape_timeout: 10s
-      static_configs:
-      # Insert NUT server address here
-      - targets: ['10.0.10.9:3493']
-      metrics_path: /metrics
-      relabel_configs:
-        - source_labels: [__address__]
-          target_label: __param_target
-        - source_labels: [__param_target]
-          target_label: instance
-        - target_label: __address__
-          # Insert NUT exporter address here
-          replacement: 10.0.10.9:9995
-```
-
-This example makes the assumption that the UPS server is running on 10.0.10.9, port 3493 and that NUTCase is hosted on 10.0.10.9 port 9995. Change as appropriate for your system.
+See [Using with Prometheus and Grafana](https://github.com/ArthurMitchell42/nutcase/wiki/Using-with-Prometheus-and-Grafana)
 
 <h4 id="using-nutcase-homepage">HomePage</h4>
-To configure HomePage to display information from NUTCase up the following in your services.yaml file
-
-![Screenshot of code](https://github.com/ArthurMitchell42/nutcase/blob/1211bd35a422d9c3e6bcf10cdf3be337acb43927/resources/homepage-code.jpg)
-
-```yaml
-- UPS-Other:
-    - DS9 UPS:
-        href: http://10.0.10.9:9995/log?lines=40
-        description: DS9 UPS
-        icon: ups.png
-        widget:
-            type: customapi
-            url: http://10.0.10.9:9995/json?target=10.0.10.9:3493
-            refreshInterval: 60000 # In milliseconds, set to ~60s
-            method: GET
-            mappings:
-                - field: 
-                    ups:
-                      input.voltage
-                  label: Input
-                  format: text
-                  suffix: V
-                - field: 
-                    ups: battery.runtime
-                  label: Runtime
-                  format: float
-                  scale: 1/60
-                  suffix: Min
-                - field: 
-                    ups:
-                      ups.load
-                  label: Power
-                  format: text
-                  suffix: "%"
-                - field: 
-                    ups:
-                      ups.status
-                  label: Status
-                  format: text
-                  remap:
-                    - value: "OL"
-                      to: On-Line
-                    - value: "OB"
-                      to: Discharge
-```
-
-This will give a display as follows
-
-![Screenshot of HomePage](https://github.com/ArthurMitchell42/nutcase/blob/1211bd35a422d9c3e6bcf10cdf3be337acb43927/resources/homepage-image.jpg)
-
-You can customise which parameters of the UPS appear by selecting them from the JSON data supplied by the JSON end point, see above.
+To configure HomePage to display information from NUTCase see [Customising the Data Displayed on the HomePage App](https://github.com/ArthurMitchell42/nutcase/wiki/Customising-the-Data-Displayed-on-the-HomePage-App)
 
 [Contents](#contents)
 
