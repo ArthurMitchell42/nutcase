@@ -192,11 +192,14 @@ Please see [Accessing and Using NUTCase](https://github.com/ArthurMitchell42/nut
 [Contents](#contents)
 
 <h3 id="using-nutcase">Using NUTCase</h3>
+<h4 id="using-nutcase-prometheus">Prometeus & Grafana</h4>
 
 See [Using with Prometheus and Grafana](https://github.com/ArthurMitchell42/nutcase/wiki/Using-with-Prometheus-and-Grafana)
 
 <h4 id="using-nutcase-homepage">HomePage</h4>
+
 To configure HomePage to display information from NUTCase see [Customising the Data Displayed on the HomePage App](https://github.com/ArthurMitchell42/nutcase/wiki/Customising-the-Data-Displayed-on-the-HomePage-App)
+
 
 [Contents](#contents)
 
