@@ -1,0 +1,59 @@
+<!-- Body content title bar  -->
+<div class="container-fluid d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center px-2 pt-0 pb-1 header-strip"> 
+    <!--=== Left ===-->
+    <div>
+      <span class="align-text-top header-strip"><i class="bi bi-hdd-rack"></i> {{ config['HOST_NAME'] }} - {{ config['CONFIG_SET'] }}</span>
+    </div>
+    <!--=== Centre ===-->
+    <div>
+        <span class="text-muted align-text-top header-strip">{{ title }}</span>
+    </div>
+    <!--=== Right ===-->
+    <div class="d-inline pt-2">
+      <span class="ps-1 pe-1">
+        <a href="{{ url_for('main.index') }}"><i class="bi-house px-0 header-icons"></i></a>
+      </span>        
+      <span class="ps-1 pe-1">
+{% if config['UI_DARK_THEME'] %}
+        <a href="{{ url_for('main.toggle_ui_mode') }}"><i class="bi-sun px-0 header-icons"></i></a>
+{% else %}
+        <a href="{{  url_for('main.toggle_ui_mode') }}"><i class="bi-moon px-0 header-icons"></i></a>
+{% endif %}
+      </span>  
+      <a href="{{ url_for('diag.notifications') }}" class="header-icons">       
+        <span class="ps-1 pe-2">
+        <i class="bi-info-circle position-relative header-icons">
+{% if config['APP_STATUS_FLAGS'] %}
+  {% if config['APP_STATUS_FLAGS'].info > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success header-icon-pill">
+        {{ config['APP_STATUS_FLAGS'].info }}
+        </span>
+    {% endif %}
+{% endif %}
+        </i>
+      </span>        
+      <span class="ps-1 pe-2">
+        <i class="bi-exclamation-triangle position-relative header-icons">
+{% if config['APP_STATUS_FLAGS'] %}
+  {% if config['APP_STATUS_FLAGS'].warning > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning header-icon-pill" style="color: black;">
+          {{ config['APP_STATUS_FLAGS'].warning }}
+        </span>
+  {% endif %}
+{% endif %}
+        </i>
+      </span>        
+      <span class="ps-1 pe-2">
+        <i class="bi-bell position-relative header-icons">
+{% if config['APP_STATUS_FLAGS'] %}
+  {% if config['APP_STATUS_FLAGS'].alert > 0 %}
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger header-icon-pill">
+        {{ config['APP_STATUS_FLAGS'].alert }}
+    </span>  
+  {% endif %}
+{% endif %}
+        </i>
+      </span></a>        
+      <i class="bi-question-circle ps-2 header-icons" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
+    </div>
+  </div>

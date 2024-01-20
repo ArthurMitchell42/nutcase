@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% if title %}
+    <title>{{ title }} - {{ config['APP_NAME'] }}</title>
+    {% else %}
+    <title>{{ config['APP_NAME'] }}</title>
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="/static/fontawesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- { % if config['UI_DARK_THEME'] == True % } -->
+    <!-- <link rel="stylesheet" type="text/css" href="/static/css/bootstrap/bs5_base_left_navbar_dark.css"> -->
+    <!-- { % else % } -->
+    <!-- <link rel="stylesheet" type="text/css" href="/static/css/bootstrap/bs5_base_left_navbar_light.css"> -->
+    <!-- { % endif % } -->
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap/bootstrap5_base.css">
+
+    {% block head %}{% endblock %}
+</head>
+<body id="id-html-body" class="cl-body-width">
+
+<!--============================================ Flash messages ============================================-->
+{% include 'bootstrap/flash_message_body.html' %}
+
+<!--============================================ Body messages ============================================-->
+{% include 'bootstrap/body_messages.html' %}
+
+<!-- Central area content supplied by caller -->
+{% block content %}{% endblock %}
+
+<!-- Scripts -->
+<div id="scripts">
+    <!-- { { moment.include_moment() } } -->
+    <!-- { { moment.lang(g.locale) } } -->
+
+   <script type="text/javascript" src="/static/jquery/jquery.min.js"></script>
+   <script type="text/javascript" src="/static/popper/popper.min.js"></script>  
+   <script type="text/javascript" src="/static/bootstrap/js/bootstrap.min.js"></script>
+<!--    <script type="text/javascript" src="/static/feather/feather.js"></script>
+    <script>feather.replace()</script>-->
+
+   {% include 'bootstrap/flash_message_script.html' %}
+
+{% block script %}{% endblock %}
+</div>
+</body>
+</html>

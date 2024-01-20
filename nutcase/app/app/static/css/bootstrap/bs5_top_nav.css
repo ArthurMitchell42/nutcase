@@ -1,0 +1,55 @@
+:root {
+    --chart-height: 240px;
+    /* --header-strip-icon-size: 19px; */
+    /* --header-strip-font-size: 20px; */
+    --header-strip-pill-font-size: 11px;
+    --header-strip-font-weight: bold;
+  }
+.navbar{
+    padding: 0 0 !important;
+}
+.main-title {
+    color:  var(--bs-primary);
+    /* opacity: .25; */
+}
+.main-data {
+    color:  var(--bs-secondary);
+    /* opacity: .25; */
+}
+.main-data-warn {
+    color:  var(--bs-warning);
+    /* opacity: .25; */
+}
+.main-data-danger {
+    color:  var(--bs-danger);
+    /* opacity: .25; */
+}
+.main-icon {
+    color:  var(--bs-primary);
+    opacity: 0.1;
+}
+.main-icon-error {
+    color:  var(--bs-danger);
+    opacity: 1.0;
+}
+.main-icon.active {
+    color:  var(--bs-primary);
+    opacity: 1.0;
+}
+.nav-link {
+    font-size:larger;
+    padding-top: 1rem;
+}
+.header-icons {
+    /* color: var(--header-strip-icon-colour); */
+    /* font-size: var(--header-strip-icon-size); */
+    font-weight: var(--header-strip-font-weight);
+    font-style: normal;
+    text-decoration: none;
+}
+.header-icon-pill {
+    font-size: var(--header-strip-pill-font-size);
+    font-weight: var(--header-strip-font-weight);
+    font-style: normal;
+    text-decoration: none;
+}

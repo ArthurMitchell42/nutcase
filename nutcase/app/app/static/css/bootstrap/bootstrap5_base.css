@@ -1,0 +1,27 @@
+/* :root {
+    --nav-width-wide: 155px;
+    --nav-width-narrow: 52px;
+    --z-fixed: 100;
+    --header-strip-font-size: 20px;
+    --header-strip-pill-font-size: 11px;
+    --header-strip-icon-size: 19px;
+    --header-strip-font-weight: bold;
+
+    --nav-flash-width: 4px;
+    --body-font: 'Nunito', sans-serif;
+    --body-font-size: 16px;
+    --leftnav-font-size: 16px;
+    --left-nav-font: 'Nunito', sans-serif;
+}
+body {
+    position: relative;
+    margin: 0 0 0 0;
+    padding: 0 0;
+    font-family: var(--body-font);
+    font-size: var(--body-font-size); 
+    transition: .5s;
+}
+main {
+    background-color: var(--colour-main-bg);
+    height: 100vh;
+} */

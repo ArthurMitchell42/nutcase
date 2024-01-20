@@ -1,0 +1,32 @@
+
+<!-- Flash message toast script -->
+<script>
+    window.onload = function() {
+      var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+      var toastList = toastElList.map(function(toastEl) {
+        return new bootstrap.Toast(toastEl)
+      })
+      toastList.forEach(toast => toast.show())
+      trigger_toast_bar()
+  };
+
+  function trigger_toast_bar() {
+    var i = 0;
+    if (i == 0) {
+      i = 1;
+      var elems = document.getElementsByName("toastProgressBar");
+      var width = 100;
+      elems.forEach(elem => elem.style.width = width + "%");
+      var id = setInterval(frame, 45);
+      function frame() {
+        if (width <= 0) {
+          clearInterval(id);
+          i = 0;
+        } else {
+          width--;
+          elems.forEach(elem => elem.style.width = width + "%");
+        }
+      }
+    }
+  } 
+</script>

@@ -1,0 +1,12 @@
+<!--=========================================== Messages ===============================================-->
+{% if body_messages %}
+<div class="container">
+{% for message in body_messages %}
+  <div class="alert {{ message.get('style') }} alert-dismissible fade show" role="alert">
+    {{ message.get('icon')|safe }}
+    <strong>{{ message.get('title')|e }}</strong> {{ message.get('body')|e }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
