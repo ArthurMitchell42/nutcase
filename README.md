@@ -21,7 +21,7 @@
 * The JSON output can be used with [Uptime Kuma](https://github.com/louislam/uptime-kuma) and other reporting, alarming and monitoring apps.
 * Provides diagnostic information and usage information.
 * Supports APC apcupsd servers for graphic display **and** metric scraping - **Use one Prometheus and Grafana dashboard for all servers.**
-* Supports filtering of JSON elements to support simple monitoring apps. See [Filtering the JSON](https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase#filtering-the-json-) <img src="https://img.shields.io/badge/New_in_V0.3.0_Beta_4-8A2BE2">
+* Supports filtering of JSON elements to support simple monitoring apps. See [Filtering the JSON](https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase#filtering-the-json-) <a href="https://github.com/ArthurMitchell42/nutcase/discussions/19"><img src="https://img.shields.io/badge/New_in_V0.3.0_Beta_4-8A2BE2"></a>
 
 ### How It Works
 
