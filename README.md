@@ -10,7 +10,7 @@
 [![Docker build and push](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml)
 
 > [!TIP]
-> ### News: [Beta 4 of V0.3.0](https://github.com/ArthurMitchell42/nutcase/discussions/19) is released with lots of new features and a GUI - 20/1/2024
+> ### News: [Beta 7 of V0.3.0](https://github.com/ArthurMitchell42/nutcase/discussions/19) is released today. This will be the last beta before release - 25/1/2024
 
 <h2 id="introduction">A Network UPS Tools (NUT) and APC daemon exporter to pass data to Prometheus and any JSON compatible applications</h2>
 <h3 id="key-features">Key features</h3>
