@@ -10,7 +10,7 @@
 [![Docker build and push](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml)
 
 > [!TIP]
-> ### News: [Beta 7 of V0.3.0](https://github.com/ArthurMitchell42/nutcase/discussions/19) is released today. This will be the last beta before release - 25/1/2024
+> ### News: [V0.3.0](https://github.com/ArthurMitchell42/nutcase/discussions/30) is released today. - 3/2/2024
 
 <h2 id="introduction">A Network UPS Tools (NUT) and APC daemon exporter to pass data to Prometheus and any JSON compatible applications</h2>
 <h3 id="key-features">Key features</h3>
@@ -22,6 +22,8 @@
 * Provides diagnostic information and usage information.
 * Supports APC apcupsd servers for graphic display **and** metric scraping - **Use one Prometheus and Grafana dashboard for all servers.**
 * Supports filtering of JSON elements to support simple monitoring apps. See [Filtering the JSON](https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase#filtering-the-json-) <a href="https://github.com/ArthurMitchell42/nutcase/discussions/19"><img src="https://img.shields.io/badge/New_in_V0.3.0_Beta_4-8A2BE2"></a>
+
+![image](https://github.com/ArthurMitchell42/nutcase/assets/82239494/6fbfa4d8-7cbc-4882-9e8e-ac3907e70d9a)
 
 ### How It Works
 
@@ -71,7 +73,7 @@ The Wiki for usage information and advice:
 
 <h3 id="architectures">Supported Architectures</h3>
 <p>
-Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker under Raspberry PI with a 64-bit OS such as Raspberry PI OS 64-bit and Ubuntu 64-bit) & 'ARM32 V7 (armhf)' (suitable for running on docker under Raspberry PI 32-bit OS)    
+Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker under Raspberry PI with a 64-bit OS such as Raspberry PI OS 64-bit and Ubuntu 64-bit)'     
 <br>
 
 <table>
@@ -86,17 +88,10 @@ Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker un
 <td>latest-amd64 For PC and Synology DSM</td>
 </tr>
 <tr>
-<td align="center">ARM32V7 (armhf 32-bit)</td>
-<td>latest-arm32v7 For Raspberry PI with a 32-bit OS :warning:</td>
-</tr>
-<tr>
 <td align="center">ARM64V8 (ARM64)</td>
 <td>arm64v8-latest. For Raspberry PI with a 64-bit OS (RaspberryPI OS 64-bit or Ubuntu 64-bit</td>
 </tr>
 </tbody></table>
-
-> [!WARNING]
-> For security reasons, going forward I'll be focusing on 64-bit containers only.
 
 [Contents](#contents)
 
@@ -109,6 +104,11 @@ Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker un
 </tr>
 </thead>
 <tbody>
+<tr>
+<td align="left">3/2/2024</td>
+<td align="left">0.3.0</td>
+<td align="left">New GUI and many more features.</td>
+</tr>
 <tr>
 <td align="left">12/1/2024</td>
 <td align="left">0.2.2</td>
