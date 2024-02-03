@@ -2,7 +2,7 @@ from flask import current_app
 
 import re
 
-from app.api import server_constants
+from app.utils import server_constants
 
 #=======================================================================
 # Utility to print the last n lines of a log file

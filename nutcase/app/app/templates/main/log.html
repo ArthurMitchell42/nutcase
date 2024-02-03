@@ -14,17 +14,18 @@
 
       <div class="d-flex flex-column m-0">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-          <div class="dropdown">
+          <div class="dropdown" data-bs-toggle="tooltip_navbar" data-bs-placement="top" data-bs-html="true" data-bs-title="<small>Files available</small>">
             <a class="btn btn-sm btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">File</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-              {% if files %}
-              {% for f in files %}<li><a class="dropdown-item" href="{{ url_for('main.route_log')}}/{{f}}">{{f}}</a></li>{% endfor %}
-              {% else %}        
+              {{ files }}
+              <!-- { % if files %}
+              { % for f in files % }<li><a class="dropdown-item" href="{{ url_for('main.route_log')}}/{{f}}">{{f}}</a></li>{ % endfor % }
+              { % else % }        
                 <li><a class="dropdown-item" href="#">No files</a></li>
-              {% endif %}
+              { % endif % } -->
             </ul>
           </div>
-        <div class="dropdown">
+        <div class="dropdown" data-bs-toggle="tooltip_navbar" data-bs-placement="top" data-bs-html="true" data-bs-title="<small>Number to display</small>">
           <a class="btn btn-sm btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">Lines</a>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
             <li><a class="dropdown-item" href="{{ url_for('main.route_log') }}/{{filename}}?lines=20">20</a></li>
@@ -37,7 +38,7 @@
       </div>
 
       <div class="d-flex flex-column m-0 mx-2">
-          <div class="d-grid gap-2 d-md-flex justify-content-end">
+          <div class="d-grid gap-2 d-md-flex justify-content-end" data-bs-toggle="tooltip_navbar" data-bs-placement="top" data-bs-html="true" data-bs-title="<small>Download this file</small>">
             <a href="{{ url_for('main.route_download') }}/{{filename}}" class="btn btn-sm btn-primary" role="button"><i class="bi bi-download"></i> </a>
             </div>
       </div>

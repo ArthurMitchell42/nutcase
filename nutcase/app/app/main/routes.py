@@ -9,13 +9,14 @@ import json
 import os
 import datetime;
 
-from app.api import server_constants
-from app.api import format_to_text
-from app.api import format_to_json
-from app.api import apc_server_handler
-from app.api import configuration
-from app.api import scrape
-from app.api import file_utils
+from app.utils import server_constants
+from app.utils import format_to_text
+from app.utils import format_to_json
+from app.utils import apc_server_handler
+from app.utils import configuration
+from app.utils import scrape
+from app.utils import file_utils
+from app.utils import gui_data_format
 
 #=======================================================================
 # before_app_request - Run before every request to check config file
@@ -39,9 +40,13 @@ def route_index():
     #                 title = 'Get URL failed',
     #                 body  = 'Return code '
     #                 ))
+# TODO - reduce logging levels
+    for a in request.args:
+        current_app.logger.debug("request.args: key {} value {}".format( a, request.args[a] ))
 
     Addr = request.args.get("addr", default='default')
     Device = request.args.get("dev", default='default')
+    current_app.logger.debug("route_index: Addr {} Device {}".format( Addr, Device ))
 
     if ('target_device' not in session) or (session['target_device'] != Addr + Device):
         Length = current_app.config['CHART_SAMPLES']
@@ -146,7 +151,11 @@ def route_metrics():
 #====================================================================================
 @bp.route('/log')
 @bp.route('/log/<Filename>')
-def route_log(Filename='nutcase.log'):
+def route_log(Filename=''):
+    if Filename == '':
+        Filename = current_app.config['LOGFILE_NAME']
+
+    # Get the number of lines requested
     Log_Lines = current_app.config["DEFAULT_LOG_LINES"]
     if Lines := request.args.get("lines"):
         try:
@@ -155,15 +164,18 @@ def route_log(Filename='nutcase.log'):
         except:
             current_app.logger.error("Error defining log lines: {}".format( Lines ))
 
-    Logfile_Dir = os.path.join(current_app.root_path, current_app.config['LOGFILE_RELATIVE_PATH'])
-    Logfile_Fullname = os.path.join(Logfile_Dir, Filename )
-    File_List = os.listdir(Logfile_Dir)
+    # Generate the HTML for the list of files
+    Logfile_Directory = os.path.join(current_app.config['CONFIG_PATH'], current_app.config['LOGFILE_SUBPATH'])
+    Logfile_Fullname = os.path.join(Logfile_Directory, Filename )
 
+    File_List = gui_data_format.Generate_Log_Files_Pulldown( Logfile_Directory )
+
+    # Get lines from the requested log file
     rtn, Lines = file_utils.Tail_File( Logfile_Fullname, Log_Lines )
     if not rtn: 
         Lines = [ "<pre>Log file not found</pre>" ]
 
-    return render_template('main/log.html', title="Log file", lines=Lines, files=File_List, filename=Filename )
+    return render_template('main/log.html', title="Log file", lines=Lines, files=Markup(File_List), filename=Filename )
 
 #====================================================================================
 # Serve the end-point /help

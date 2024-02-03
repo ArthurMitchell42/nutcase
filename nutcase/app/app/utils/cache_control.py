@@ -32,7 +32,7 @@ def Add_To_Cache( Target_Address, Target_Port, Scrape_Data ):
         return
     
     Cache_Target = Target_Address + "_" + str(Target_Port)
-    current_app.logger.debugv("Add to cache {}".format( Cache_Target ))
+    current_app.logger.debug("Add to cache {}".format( Cache_Target ))
 
     current_app.config["SCRAPE_CACHE"][Cache_Target]         = {}
     current_app.config["SCRAPE_CACHE"][Cache_Target]["time"] = time.time()
@@ -48,7 +48,7 @@ def Tidy_Cache():
     for c in current_app.config["SCRAPE_CACHE"]: 
         Age = (time.time() - current_app.config["SCRAPE_CACHE"][c]["time"])
         if Age > current_app.config["CACHE_PERIOD"]:
-            current_app.logger.debugv("Remove from cache {}".format( c ))
+            current_app.logger.debug("Remove from cache {}".format( c ))
             Remove_List.append(c)
 
     for r in Remove_List:

@@ -1,6 +1,6 @@
 from flask import current_app
 
-from app.api import metric_data
+from app.utils import metric_data
 
 #=======================================================================
 # Enumerated types & constants

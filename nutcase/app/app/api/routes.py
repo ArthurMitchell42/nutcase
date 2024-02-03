@@ -2,8 +2,8 @@ from flask import current_app, request
 
 from app.api import bp
 
-from app.api import scrape
-from app.api import gui_data_format
+from app.utils import scrape
+from app.utils import gui_data_format
 
 #====================================================================================
 # Serve the end-point /api/status

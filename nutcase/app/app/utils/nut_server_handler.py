@@ -4,7 +4,7 @@ import re
 import socket
 from enum import Enum
 
-from app.api import rework_data
+from app.utils import rework_data
 
 #=======================================================================
 # Enumerated types

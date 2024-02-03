@@ -3,8 +3,8 @@ from flask import current_app
 import time         # To format time variables 
 import re           # for splitting status strings
 
-from app.api import format_to_text
-from app.api import configuration
+from app.utils import format_to_text
+from app.utils import configuration
 
 #====================================================================================================
 # Transform a variable to an enumerated string

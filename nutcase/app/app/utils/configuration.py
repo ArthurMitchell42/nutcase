@@ -1,6 +1,48 @@
+import logging
 import os
 import yaml
 from pathlib import PurePath
+
+from app.utils import app_log_config
+
+#====================================================================================================
+# Load_YAML_As_Dictionary
+#====================================================================================================
+def Load_YAML_As_Dictionary( app, Filename ):
+    #=================================================================================
+    # Load the YAML and convert to a dictionary
+    #=================================================================================
+    try:
+        with open(Filename, "r") as File_Handle:
+            try:
+                Data = yaml.safe_load( File_Handle )
+                app.logger.debugv("Loaded YAML from {}".format( Filename ))
+            except yaml.YAMLError as Error:
+                app.logger.error("Error loading YAML {}".format( Error ))
+                return None
+    except Exception as Error:
+        app.logger.warning("Could not open YAML file {}. Error: {}".format( Filename, Error ) )
+        return None
+    return Data
+
+#====================================================================================================
+# Save_Dictionary_As_YAML
+#====================================================================================================
+def Save_Dictionary_As_YAML( app, Filename, Data ):
+    #=================================================================================
+    # Save the dictionary as YAML
+    #=================================================================================
+    try:
+        with open(Filename, "w") as File_Handle:
+            try:
+                yaml.dump( Data, File_Handle )
+            except yaml.YAMLError as Error:
+                app.logger.error("Error loading YAML {}".format( Error ))
+                return False
+    except Exception as Error:
+        app.logger.warning("Could not save YAML file {}. Error: {}".format( Filename, Error ) )
+        return False
+    return True
 
 #=======================================================================
 # Get_Server - Return the server dictionary from Config->settings
@@ -31,7 +73,7 @@ def Update_Settings( Config, app ):
     if "default_log_lines" in Config["settings"]:
         if isinstance(Config["settings"]["default_log_lines"], int):
             app.config["DEFAULT_LOG_LINES"] = Config["settings"]["default_log_lines"]
-
+    
     #=======================================================================
     if "cache_period" in Config["settings"]:
         if isinstance(Config["settings"]["cache_period"], int):
@@ -49,66 +91,94 @@ def Update_Settings( Config, app ):
     #=======================================================================
     # Log file settings
     #=======================================================================
-    if "log_level" in Config["settings"]:
-        try:              
-            app.logger.info("Setting log level: {}".format( Config["settings"]["log_level"].upper() ) )
-            
-#=======================================================================
-#=======================================================================
-#=======================================================================
-#=======================================================================
-# Beta override! TODO: Remove on release
-#=======================================================================
-#=======================================================================
-#=======================================================================
-#=======================================================================
-            Debug_List = [ 'DEBUG', 'DEBUGV', 'DEBUGVV' ]
-            if Config["settings"]["log_level"].upper() in Debug_List:
-                app.logger.setLevel( Config["settings"]["log_level"].upper() )
-            else:
-                app.logger.setLevel( 'DEBUG' )
-                app.logger.warning("Beta override: Config file logging level overridden")
+    Update_RF_Handler = False
+    if "log_maxbytes" in Config["settings"]:
+        if isinstance(Config["settings"]["log_maxbytes"], int):
+            app.config["LOGFILE_MAXBYTES"] = Config["settings"]["log_maxbytes"]
+            Update_RF_Handler = True
 
-        except Exception as Error: 
-            app.logger.error("Error using log_level value from file: {}".format( Config["settings"]["log_level"] ) )
+    if "log_backupcount" in Config["settings"]:
+        if isinstance(Config["settings"]["log_backupcount"], int):
+            app.config["LOGFILE_BACKUPCOUNT"] = Config["settings"]["log_backupcount"]
+            Update_RF_Handler = True
+
+    if Update_RF_Handler:
+        app_log_config.Update_RF_Handler( app )
+
+    Console_Level = Logfile_Level = None
+    if "log_level" in Config["settings"]:
+        if app_log_config.Check_Level( Config["settings"]["log_level"].upper() ):
+            Console_Level = Logfile_Level = Config["settings"]["log_level"].upper()
+
+    if "log_level_console" in Config["settings"]:
+        if app_log_config.Check_Level( Config["settings"]["log_level_console"].upper() ):
+            Console_Level = Config["settings"]["log_level_console"].upper()
+
+    if "log_level_logfile" in Config["settings"]:
+        if app_log_config.Check_Level( Config["settings"]["log_level_logfile"].upper() ):
+            Logfile_Level = Config["settings"]["log_level_logfile"].upper()
+
+    if Console_Level:
+        app_log_config.Set_Log_Level( app, Console_Level, "con" )
+        app.logger.info("Setting console log level from config {}".format( Console_Level ) )
+
+    if Logfile_Level:
+        app_log_config.Set_Log_Level( app, Logfile_Level, "rfh" )
+        app.logger.info("Setting logfile log level from config {}".format( Logfile_Level ) )
+
+    #=======================================================================
+    # As a beta testing measure only, the log level can be overridden
+    #=======================================================================
+    if app.config["BETA_OVERRIDE"]:
+        Console_Handler = app_log_config.Get_Handler( app, 'con' )
+        if 'DEBUG' not in logging.getLevelName(Console_Handler):
+            Console_Handler.setLevel( 'DEBUG' )
+            app.logger.warning("Beta override: Console logging level overridden to DEBUG. (Sorry about the file size)")
+
+        Logfile_Handler = app_log_config.Get_Handler( app, 'rfh' )
+        if 'DEBUG' not in logging.getLevelName(Logfile_Handler):
+            Logfile_Handler.setLevel( 'DEBUG' )
+            app.logger.warning("Beta override: Logfile logging level overridden to DEBUG. (Sorry about the file size)")
 
     #=======================================================================
     # Webhook settings
     #=======================================================================
     if "webhooks" in Config:
-        app.config["WEBHOOKS"] = Config["webhooks"]
+        # app.config["WEBHOOKS"] = Config["webhooks"]
+        app.config.update( WEBHOOKS = Config["webhooks"] )
 
     #=======================================================================
     # Rework settings
     #=======================================================================
     if "rework" in Config:
-        app.config["REWORK"] = Config["rework"]
+        # app.config["REWORK"] = Config["rework"]
+        app.config.update( REWORK = Config["rework"] )
 
     #=======================================================================
     # Servers & Credentials settings
     #=======================================================================
     if "servers" in Config:
         app.config["SERVERS"] = Config["servers"]
-        if "credentials" in Config:
-            for Srv in app.config["SERVERS"]:
-                if 'username' in Srv and 'password' in Srv:
-                    app.config["CREDENTIALS"].append( {
-                        'server': Srv['server'],
-                        'device': Srv['device'],
-                        'username': Srv['username'],
-                        'password': Srv['password']
-                    } )
+        # if "credentials" in Config:
+        for Srv in app.config["SERVERS"]:
+            if 'username' in Srv and 'password' in Srv:
+                app.config["CREDENTIALS"].append( {
+                    'server': Srv['server'],
+                    'device': Srv['device'],
+                    'username': Srv['username'],
+                    'password': Srv['password']
+                } )
     return
 
 #=======================================================================
 # Config_File_Modified
 #=======================================================================
 def Config_File_Modified( app ):
-    if not os.path.isfile( app.config["CONFIG_FILENAME"] ):
-        app.logger.warning("Config file missing {}".format( app.config["CONFIG_FILENAME"] ) )
+    if not os.path.isfile( app.config["CONFIG_FULLNAME"] ):
+        app.logger.warning("Config file missing {}".format( app.config["CONFIG_FULLNAME"] ) )
         return False
 
-    if os.path.getmtime(app.config["CONFIG_FILENAME"]) > app.config["CONFIG_MOD_TIME"]: 
+    if os.path.getmtime(app.config["CONFIG_FULLNAME"]) > app.config["CONFIG_MOD_TIME"]: 
         app.logger.debug("Config file has been updated" )
         return True
     return False
@@ -133,20 +203,16 @@ def List_Variables( Config, app ):
 #       False : Config failed tests
 #====================================================================================================
 def Parse_Config( Config, app ):
-    Sections          = [ 'credentials', 'rework', 'settings', 'webhooks', 'servers' ]
+    Sections          = [ 'rework', 'settings', 'webhooks', 'servers' ]
     Styles            = [ 'time', 'simple-enum', 'ratio', 'comp-enum', 'cl-count', 'cl-check' ]
     Expected_WebHooks = [ 'default', 'ok', 'fail' ]
 
     #=================================================================================
     # Check information is present
     #=================================================================================
-    if not Config:
+    if not Config or len( Config ) == 0:
         app.logger.debug("Control file has no directives")
-        return True
-
-    if len( Config ) == 0:
-        app.logger.debug("Control file has no directives (length = 0)")
-        return True
+        return False
 
     #=================================================================================
     # All Sections entries should always be in the Config dictionary, even if empty
@@ -165,16 +231,6 @@ def Parse_Config( Config, app ):
     #=================================================================================
     # Check all required fields are present
     #=================================================================================
-    # if 'credentials' in Config:
-    for Entry in Config['credentials']:
-        try:
-            assert 'server'   in Entry
-            assert 'device'   in Entry
-            assert 'username' in Entry
-            assert 'password' in Entry
-        except AssertionError:
-            app.logger.error("Credentials need 'server', 'device', 'username' & 'password' {}".format(Entry))
-            return False
 
     #=================================================================================
     # if 'webhooks' in Config:
@@ -192,28 +248,35 @@ def Parse_Config( Config, app ):
                 assert Expected_Name in Config['webhooks']
             except AssertionError:
                 app.logger.warning("Config is missing WebHook name {}".format( Expected_Name ))
-                return True
 
     #=================================================================================
     # if 'rework' in Config:
+    Checked_Rework = []
     for Entry in Config['rework']:
+        Include_Directive = True
         try:
             assert 'from'    in Entry
             assert 'to'      in Entry
             assert 'style'   in Entry
             assert 'control' in Entry
         except AssertionError:
-            app.logger.error("Rework must have 'from', 'to', 'style' and 'control' entires {}".format(Entry))
-            return False
+            app.logger.error("All rework directives must have 'from', 'to', 'style' and 'control' entires {}".format(Entry))
+            Include_Directive = False
 
         try:
             assert Entry['style'] in Styles
         except AssertionError:
             app.logger.error("Unknown style {}, styles are: {}".format( Entry,", ".join(Styles)))
-            return False
+            Include_Directive = False
 
         #================================================================================================
-        if Entry['style'] == 'simple-enum' or Entry['style'] == 'comp-enum':
+        if Include_Directive and Entry['style'] == 'simple-enum' or Entry['style'] == 'comp-enum':
+            try:
+                assert isinstance( Entry['control'], dict)
+            except AssertionError:
+                app.logger.error("For simple-enum style 'control' must be a dictionary, not a list etc. Found:\n{}".format( Entry['control'] ))
+                Include_Directive = False
+
             try:
                 assert 'from'    in Entry['control']
                 assert 'to'      in Entry['control']
@@ -223,24 +286,29 @@ def Parse_Config( Config, app ):
                 assert len( Entry['control']['from'] ) == len( Entry['control']['to'] )
             except AssertionError:
                 app.logger.error("All enum style directives must have 'from', 'to' and 'default' in 'control' and 'from' and 'to' must be arrays of equal length\n{}".format( Entry ))
-                return False
+                Include_Directive = False
         #================================================================================================
-        if Entry['style'] == 'cl-count':
+        elif Include_Directive and Entry['style'] == 'cl-count':
             try:
                 assert isinstance( Entry['control'], list )
                 assert len(Entry['control']) == 4
                 Entry['control'][0] = int( Entry['control'][0] ) 
             except AssertionError:
                 app.logger.error("All cl-count style directives must have a 4 element array as the 'control' value with the first element being an integer.\n{}".format( Entry ))
-                return False
+                Include_Directive = False
         #================================================================================================
-        if Entry['style'] == 'cl-check':
+        elif Include_Directive and Entry['style'] == 'cl-check':
             try:
                 assert isinstance( Entry['control'], list )
                 assert len(Entry['control']) > 0
             except AssertionError:
                 app.logger.error("All cl-check style directives must have a non-zero length array as the 'control' value.\n{}".format( Entry ))
-                return False
+                Include_Directive = False
+
+        if Include_Directive:
+            Checked_Rework.append(Entry)
+    
+    Config['rework'] = Checked_Rework
 
     #=================================================================================
     # if 'servers' in Config:
@@ -256,49 +324,51 @@ def Parse_Config( Config, app ):
     return True
 
 #====================================================================================================
-# Load_Config
+# Identify_Config_File
 #====================================================================================================
-def Load_Config( app ):
+def Identify_Config_File( app ):
     #=================================================================================
     # Find the configuration file starting with .yml and changing to .yaml in needed
     # A user setting in the CONFIG_FILE overrides this.
     #=================================================================================
-    Configfile_Dir  = os.path.join(app.root_path, app.config['LOGFILE_RELATIVE_PATH'])
-    Config_Filename = os.path.join(Configfile_Dir, 'nutcase.yml')
+    app.logger.debugv("Load_Config: CONFIG_PATH {} CONFIG_FILE {}".format( app.config['CONFIG_PATH'], app.config['CONFIG_FILE'] ) )
+    Config_Filename = os.path.join(app.config['CONFIG_PATH'], app.config['CONFIG_FILE'])
 
-    if not os.path.isfile( Config_Filename ):
-        p = PurePath( Config_Filename )
+    p = PurePath( Config_Filename )
+    Check_Filename = p.with_suffix('.yml')
+
+    app.logger.debugv("Load_Config: Trying Check_Filename {}".format( Check_Filename ) )
+
+    if not os.path.isfile( Check_Filename ):
         Check_Filename = p.with_suffix('.yaml')
-        if os.path.isfile( Check_Filename ):
-            Config_Filename = Check_Filename
-            app.logger.debug("Changing config file to {}".format( Config_Filename ) )
+        app.logger.debugv("Load_Config: Not found, Trying Check_Filename {}".format( Check_Filename ) )
+        if not os.path.isfile( Check_Filename ):
+            app.logger.warning("Config file not found as either .yml or .yaml {}".format( app.config['CONFIG_FILE'] ) )
+            return None
+        
+    app.logger.debug("Config file is {}".format( Check_Filename ) )
+    app.config.update( CONFIG_FULLNAME = Check_Filename )
+    return Check_Filename
 
-    if not os.path.isfile( Config_Filename ):
-        app.logger.info("Config file not found as either .yml or .yaml {}".format( Config_Filename ) )
-        return None
+#====================================================================================================
+# Load_Config
+#====================================================================================================
+def Load_Config( app ):
+    #=================================================================================
+    # Put the identified config file name in CONFIG_FULLNAME
+    #=================================================================================
+    Config_Filename = Identify_Config_File( app )
 
     #=================================================================================
     # Load the YAML and convert to a dictionary
     #=================================================================================
-    try:
-        with open(Config_Filename, "r") as Config_File_Handle:
-            try:
-                Config = yaml.safe_load( Config_File_Handle )
-                app.logger.info("Loaded YAML configuration from {}".format( Config_Filename ))
-                app.logger.debug("Control YAML:\n{}".format( Config ))
-                #=====================================================================
-                # Record the mod time of the config file
-                #=====================================================================
-                app.config["CONFIG_MOD_TIME"] = os.path.getmtime( Config_Filename )
-            except yaml.YAMLError as Error:
-                app.logger.error("Error loading Control YAML {}".format( Error ))
-                return None
-    except Exception as Error:
-        app.logger.warning("Could not open config file {}. Error: {}".format( Config_Filename, Error ) )
-        return None
+    Config = Load_YAML_As_Dictionary( app, Config_Filename )
 
-    app.config["CONFIG_FILENAME"] = Config_Filename
-
+    #=====================================================================
+    # Record the mod time of the config file
+    #=====================================================================
+    app.config.update( CONFIG_MOD_TIME = os.path.getmtime( Config_Filename ) )
+    
     #=================================================================================
     # Do validity checking in the loaded configuration
     #=================================================================================

@@ -1,15 +1,19 @@
 from flask import current_app, session
 import re           # To break status words
 import time         # To format time variables 
+import arrow        # To print human readable times
+import os
 
-from app.api import format_to_text
-from app.api import configuration
-from app.api import apc_to_nut
-from app.api import scrape
+from app.utils import format_to_text
+from app.utils import configuration
+from app.utils import apc_to_nut
+from app.utils import scrape
+from app.utils import file_utils
 
 #==============================================================================
 # Constatnts for GUI
 #==============================================================================
+Icon_Line            = 'bi-plugin'
 Icon_Bat_Charging    = 'bi-battery-charging'
 Icon_Bat_Full        = 'bi-battery-full'
 Icon_Bat_Half        = 'bi-battery-half'
@@ -34,7 +38,7 @@ Status_HTML = \
           {status_text}
         </div>
         <div class="d-flex px-3 align-items-center">
-          <i class="bi bi-plugin fs-3 {line_icon_style}" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="{line_icon_tip}"></i>
+          <i class="bi {line_icon} fs-3 {line_icon_style}" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="{line_icon_tip}"></i>
         </div>
         <div class="d-flex px-3 align-items-center">
           <span class="fs-4"><i class="bi {line_alert_icon} {line_alert_icon_style}" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="{line_alert_tip}"></i></span>
@@ -74,7 +78,7 @@ Sounder_HTML = \
 
 Device_Pulldown_HTML = \
 '''
-<a class="dropdown-item {active}" href="./?addr={addr}&dev={dev}{mode_q}">
+<a class="dropdown-item {active}" href="/?addr={addr}&dev={dev}{mode_q}">
     <div class="d-flex align-items-center justify-content-between">
     <div>{addr_name} {dev_name} {mode}</div>
     <div><i class="bi bi-check-circle {def_style}"></i></div>
@@ -84,10 +88,21 @@ Device_Pulldown_HTML = \
 
 Download_Pulldown_HTML = \
 '''
-<a class="dropdown-item" href="/{path}?addr={addr}&download={dl_opt}&dev={dev}{mode_q}">
-    {fmt}
+<a class="dropdown-item" href="/{path}?addr={addr}&download={dl_opt}&dev={dev}{mode_q}" target="_blank">
+{fmt}
 </a>
 '''
+
+Log_File_Pulldown_HTML = \
+'''<li>
+<a class="dropdown-item" href="/log/{file}">
+    <div class="d-flex align-items-center justify-content-between">
+    <div>{file}</div>
+    <div>&nbsp&nbsp&nbsp</div>
+    <div class="text-muted">{note}</div>
+    </div>
+</a>
+</li>'''
 
 #==============================================================================
 # Clean_List - Utility to clean 'null' values from data so that the max 
@@ -425,6 +440,60 @@ def Process_Sounder_Block( UPS, Result ):
     return
 
 #==============================================================================
+# Get_Bat_Charge_State - Util to get a state for the battery charge
+# Returns:
+#   0 - Unknown
+#   1 - Low
+#   2 - Partial
+#   3 - Almost full
+#   4 - Full
+#==============================================================================
+def Get_Bat_Charge_State( UPS ):
+    State = 0
+    # Return value  0   1   2   3    4
+    Thresholds = [ -1, 25, 50, 94, 100 ]
+
+    #===========================================================
+    # Get values to update the default thresholds
+    #===========================================================
+    if Bat_Charge := format_to_text.Get_NUT_Variable( UPS, 'battery.charge' ):
+        try:
+            Bat_Charge = float(Bat_Charge)
+        except:
+            Bat_Charge = None
+        if Bat_Charge:
+            if Bat_Charge_Low := format_to_text.Get_NUT_Variable( UPS, 'battery.charge.low' ):
+                try:
+                    Bat_Charge_Low = float(Bat_Charge_Low)
+                except:
+                    Bat_Charge_Low = None
+
+            if Bat_Charge_Warn := format_to_text.Get_NUT_Variable( UPS, 'battery.charge.warning' ):
+                try:
+                    Bat_Charge_Warn = float(Bat_Charge_Warn)
+                except:
+                    Bat_Charge_Warn = None
+
+    #===========================================================
+    # Update the default thresholds if we have information
+    #===========================================================
+            if Bat_Charge_Low and Bat_Charge_Warn:
+                Thresholds[1] = Bat_Charge_Low
+                Thresholds[2] = Bat_Charge_Warn
+            elif Bat_Charge_Low and not Bat_Charge_Warn:
+                Thresholds[1] = Bat_Charge_Low
+                Thresholds[2] = ((100-Bat_Charge_Low)/2) + Bat_Charge_Low
+            elif not Bat_Charge_Low and Bat_Charge_Warn:
+                Thresholds[1] = Bat_Charge_Warn
+                Thresholds[2] = ((100-Bat_Charge_Warn)/2) + Bat_Charge_Warn
+
+    #===========================================================
+    # Map the battery charge to a return value
+    #===========================================================
+            State = min(range(len(Thresholds)), key=lambda x: (Bat_Charge - Thresholds[x]) > 0  )
+    return State
+
+#==============================================================================
 # Process_Status_Block - 
 #==============================================================================
 def Process_Status_Block( UPS, Result ):
@@ -432,29 +501,33 @@ def Process_Status_Block( UPS, Result ):
     # Status block
     Status_Text           = 'Unknown'
     Secondary_Text        = ''
+
+    Line_Icon             = Icon_Line
     Line_Icon_Style       = 'text-secondary text-muted'
-    Bat_Icon_Style        = 'text-secondary text-muted'
-    Battery_Icon          = Icon_Bat_Empty
-    Bat_Icon_Style        = 'text-info'
-    Battery_Alert_Icon    = Icon_Check
-    Bat_Alert_Icon_Style  = 'text-success'
+    Line_Icon_Tip         = 'Line OK'
+
     Line_Alert_Icon       = Icon_Unknown  # Icon_Check
     Line_Alert_Icon_Style = 'text-success'
+    Line_Alert_Tip        = 'Line OK'
 
-    Line_Icon_Tip   = 'Line OK'
-    Line_Alert_Tip  = 'Line OK'
-    Bat_Icon_Tip    = 'Battery OK'
-    Bat_Alert_Tip   = 'Battery OK'
+    Battery_Icon          = Icon_Bat_Empty
+    Battery_Icon_Style    = 'text-secondary text-muted'
+    Battery_Icon_Tip      = 'Battery OK'
+
+    Battery_Alert_Icon       = Icon_Check
+    Battery_Alert_Icon_Style = 'text-success'
+    Battery_Alert_Tip        = 'Battery OK'
 
     #===========================================================
     # Status block - server ID
     Server = configuration.Get_Server( current_app, UPS['server_address'] )
 
-    if 'name' in Server:
-        Server_Name = Server['name']
-        Result['server_summary'] = Server_Name + "&nbsp(" + UPS['server_address'] + "&nbsp-&nbsp" + UPS['name'] + ")"
-    else:
-        Result['server_summary'] = UPS['server_address'] + "&nbsp-&nbsp" + UPS['name']
+    if Server:
+        if 'name' in Server:
+            Server_Name = Server['name']
+            Result['server_summary'] = Server_Name + "&nbsp(" + UPS['server_address'] + "&nbsp-&nbsp" + UPS['name'] + ")"
+        else:
+            Result['server_summary'] = UPS['server_address'] + "&nbsp-&nbsp" + UPS['name']
 
     #===========================================================
     # Status block
@@ -464,14 +537,18 @@ def Process_Status_Block( UPS, Result ):
         Search_List = re.split(r' |:|;|-|\.|/|\\', Status_Var )
         current_app.logger.debug("Status message: {}".format( Search_List ))
  
+        #===========================================================
+        # Process line information
+        #===========================================================
         if 'OL' in Search_List:
-            Status_Text = "On-Line"
+            Status_Text     = "On-Line"
+
             Line_Icon_Style = 'text-success'
             Line_Icon_Tip   = 'On-Line, Power OK'
-            Line_Alert_Icon_Style = 'text-success'
-            Line_Alert_Icon = Icon_Vin_Normal
 
-            Line_Alert_Tip  = 'Voltage Within Limits'
+            Line_Alert_Icon       = Icon_Vin_Normal
+            Line_Alert_Icon_Style = 'text-success'
+            Line_Alert_Tip        = 'Voltage Within Limits'
         else:
             Line_Icon_Style = 'text-danger'
             Line_Icon_Tip   = 'Off-Line, Power Missing'
@@ -480,97 +557,109 @@ def Process_Status_Block( UPS, Result ):
             Line_Alert_Icon = Icon_Alert_Triangle
             Line_Alert_Tip = 'Off-Line, Power Missing'
 
-        if 'OB' in Search_List:
-            Status_Text = "On-Battery"
-            Bat_Icon_Style = 'text-warning'
-            Bat_Icon_Tip    = 'On-Battery, Discharging'
-        else:
-            Bat_Icon_Style = 'text-info'
-
-        if 'CHRG' in Search_List:
-            Secondary_Text = "Charging"
-            Battery_Icon = Icon_Bat_Charging
-            Bat_Icon_Style = 'text-info'
-            Bat_Icon_Tip    = 'Battery Charging'
-            Bat_Alert_Icon_Style = 'text-Success'
-            Battery_Alert_Icon = Icon_Check
-            Bat_Alert_Tip    = 'Battery Low, UPS Will Shutdown Soon'
-        else:
-            if Bat_Charge := format_to_text.Get_NUT_Variable( UPS, 'battery.charge' ):
-                Bat_Charge = float(Bat_Charge)
-                if Bat_Charge < 50:
-                    Bat_Icon_Style = 'text-danger'
-                    Battery_Icon = Icon_Bat_Empty
-                    Bat_Icon_Tip    = 'Battery Low, UPS Will Shutdown Soon'
-
-                    Bat_Alert_Icon_Style = 'text-warning'
-                    Battery_Alert_Icon = Icon_Error_Octagon
-                    Bat_Alert_Tip    = 'Battery Low, UPS Will Shutdown Soon'
-
-                    Secondary_Text += "Battery Low"
-                elif Bat_Charge < 85:
-                    Bat_Icon_Style = 'text-warning'
-                    Battery_Icon = Icon_Bat_Half
-                    Bat_Icon_Tip    = 'Battery Partially Discharged'
-                else:
-                    Bat_Icon_Style = 'text-info'
-                    Battery_Icon = Icon_Bat_Full
-                    Bat_Icon_Tip    = 'Battery Level Good'
-                    
-        if 'LB' in Search_List:
-            Bat_Icon_Style = 'text-danger'
-            Battery_Icon = Icon_Bat_Empty
-            Bat_Icon_Tip    = 'Battery Low, UPS Will Shutdown Soon'
-
-            Bat_Alert_Icon_Style = 'text-warning'
-            Battery_Alert_Icon = Icon_Error_Octagon
-            Bat_Alert_Tip = "Low Battery, UPS Will Shutdown Soon"
-
-            Secondary_Text += " Low Battery"
-
-        if 'RB' in Search_List:
-            Bat_Icon_Style = 'text-danger'
-            Battery_Icon = Icon_Bat_Empty
-            Bat_Icon_Tip = "Replace Battery, Battery is EOL"
-
-            Bat_Alert_Icon_Style = 'text-danger'
-            Battery_Alert_Icon = Icon_Error_Octagon
-            Bat_Alert_Tip = "Replace Battery, Battery is EOL"
-
-            Secondary_Text += " Replace Battery"
-
         if 'BOOST' in Search_List:
-            Line_Alert_Icon_Style = 'text-warning'
-            Line_Alert_Icon = Icon_Vin_Boost
-            Line_Alert_Tip = "Low Line Level"
+            Status_Text     += " Battery Boosting"
 
             Line_Icon_Style = 'text-warning'
-            Line_Icon_Tip = "Low Line Level, Boosting Input"
-            Status_Text += " Battery Boosting"
+            Line_Icon_Tip   = "Low Line Level, Boosting Input"
+
+            Line_Alert_Icon_Style = 'text-warning'
+            Line_Alert_Icon       = Icon_Vin_Boost
+            Line_Alert_Tip        = "Low Line Level"
 
         if 'TRIM' in Search_List:
-            Line_Alert_Icon_Style = 'text-warning'
-            Line_Alert_Icon = Icon_Vin_Trim
-            Line_Alert_Tip = "Line Level High, Trimming Input"
+            Status_Text     += " Trim Line"
 
             Line_Icon_Style = 'text-warning'
-            Line_Icon_Tip = "Trimming Line Level"
-            Status_Text += " Trim Line"
+            Line_Icon_Tip   = "Trimming Line Level"
+
+            Line_Alert_Icon       = Icon_Vin_Trim
+            Line_Alert_Icon_Style = 'text-warning'
+            Line_Alert_Tip        = "Line Level High, Trimming Input"
+
+        #===========================================================
+        # Process battery information
+        #===========================================================
+        Battery_Charge_State = Get_Bat_Charge_State( UPS )
+        BI_Charge_Lookup   = [ Icon_Bat_Empty, Icon_Bat_Empty,  Icon_Bat_Half,          Icon_Bat_Half, Icon_Bat_Full ]
+        BIS_Charge_Lookup  = [  'text-danger',  'text-danger', 'text-warning',         'text-warning',   'text-info' ]
+        
+        BAI_Charge_Lookup  = [  Icon_Unknown, Icon_Error_Octagon, Icon_Alert_Triangle,    Icon_Alert_Triangle,     Icon_Check ]
+        BAIS_Charge_Lookup = [ 'text-danger',      'text-danger',       'text-danger',         'text-warning', 'text-success' ]
+        BAIT_Charge_Lookup = [     'Unknown',            'Empty',               'Low', 'Partially discharged',         'Full' ]
+    
+        if 'OB' in Search_List:
+            Status_Text        = "On-Battery"
+            Secondary_Text     = "Discharging"
+
+            Battery_Icon       = BI_Charge_Lookup[ Battery_Charge_State ]
+            Battery_Icon_Style = BIS_Charge_Lookup[ Battery_Charge_State ]
+            Battery_Icon_Tip   = 'On-Battery, Discharging'
+
+            Battery_Alert_Icon       = BAI_Charge_Lookup[ Battery_Charge_State ]
+            Battery_Alert_Icon_Style = BAIS_Charge_Lookup[ Battery_Charge_State ]
+            Battery_Alert_Tip        = BAIT_Charge_Lookup[ Battery_Charge_State ]
+        else:
+            if 'CHRG' in Search_List:
+                Secondary_Text           = "Charging"
+                Battery_Icon             = Icon_Bat_Charging
+                Battery_Icon_Style       = BIS_Charge_Lookup[ Battery_Charge_State ]
+                Battery_Icon_Tip         = 'Battery Charging'
+
+                Battery_Alert_Icon       = BAI_Charge_Lookup[ Battery_Charge_State ]
+                Battery_Alert_Icon_Style = BAIS_Charge_Lookup[ Battery_Charge_State ]
+                Battery_Alert_Tip        = BAIT_Charge_Lookup[ Battery_Charge_State ]
+            else:
+                Battery_Icon             = BI_Charge_Lookup[ Battery_Charge_State ]
+                Battery_Icon_Style       = BIS_Charge_Lookup[ Battery_Charge_State ]
+                Battery_Icon_Tip         = 'OK'
+
+                Battery_Alert_Icon       = BAI_Charge_Lookup[ Battery_Charge_State ]
+                Battery_Alert_Icon_Style = BAIS_Charge_Lookup[ Battery_Charge_State ]
+                Battery_Alert_Tip        = BAIT_Charge_Lookup[ Battery_Charge_State ]
+
+        if 'LB' in Search_List:
+            Status_Text     = "On-Battery"
+            Secondary_Text += " Low battery"
+
+            Battery_Icon             = BI_Charge_Lookup[ 2 ]
+            Battery_Icon_Style       = BIS_Charge_Lookup[ 2 ]
+            Battery_Icon_Tip         = 'Battery low'
+
+            Battery_Alert_Icon       = BAI_Charge_Lookup[ 2 ]
+            Battery_Alert_Icon_Style = BAIS_Charge_Lookup[ 2 ]
+            Battery_Alert_Tip        = BAIT_Charge_Lookup[ 2 ]
+
+        if 'RB' in Search_List:
+            Secondary_Text += " Replace battery"
+
+            Battery_Icon             = Icon_Bat_Empty
+            Battery_Icon_Style       = 'text-danger'
+            Battery_Icon_Tip         = 'Battery is EOL'
+
+            Battery_Alert_Icon       = Icon_Error_Octagon
+            Battery_Alert_Icon_Style = 'text-danger'
+            Battery_Alert_Tip        = 'Battery is EOL'
 
     Result['status'] = Status_HTML.format( 
-        status_text=Status_Text,
-        line_icon_style=Line_Icon_Style,
-        bat_icon_style=Bat_Icon_Style,
-        battery_icon=Battery_Icon,
-        secondary_text=Secondary_Text,
-        line_alert_icon=  Line_Alert_Icon,
-        line_alert_icon_style=  Line_Alert_Icon_Style,
-        bat_alert_icon=  Battery_Alert_Icon,
-        bat_alert_style= Bat_Alert_Icon_Style,
-        line_icon_tip= Line_Icon_Tip,
-        line_alert_tip= Line_Alert_Tip, 
-        bat_icon_tip= Bat_Icon_Tip,
-        bat_alert_tip= Bat_Alert_Tip,
+        status_text             = Status_Text,
+        secondary_text          = Secondary_Text,
+
+        line_icon               = Line_Icon,
+        line_icon_style         = Line_Icon_Style,
+        line_icon_tip           = Line_Icon_Tip,
+
+        line_alert_icon         = Line_Alert_Icon,
+        line_alert_icon_style   = Line_Alert_Icon_Style,
+        line_alert_tip          = Line_Alert_Tip, 
+
+        battery_icon            = Battery_Icon,
+        bat_icon_style          = Battery_Icon_Style,
+        bat_icon_tip            = Battery_Icon_Tip,
+
+        bat_alert_icon          = Battery_Alert_Icon,
+        bat_alert_style         = Battery_Alert_Icon_Style,
+        bat_alert_tip           = Battery_Alert_Tip,
     )
     
     #===========================================================
@@ -699,6 +788,46 @@ def Process_Download_Pulldown( UPS, Result, Mode ):
     return
 
 #==============================================================================
+# Process_Download_Pulldown - 
+#==============================================================================
+def Generate_Log_Files_Pulldown( Directory ):
+    Menu_HTML = ""
+    Max_Files = 12
+
+    Files = os.listdir(Directory)
+    
+    if len(Files) == 0:
+        Menu_HTML = "No files found"
+    else:
+        File_List = []
+
+        for f in Files:
+            Full_Name = os.path.join(Directory, f)
+            File_Age = time.time() - os.path.getmtime( Full_Name )
+
+            Age_String = arrow.get(os.path.getmtime( Full_Name )).humanize(arrow.utcnow(), only_distance=True ) + " ago"
+            if Age_String == 'instantly ago':
+                Age_String = 'Now'
+
+            File_List.append( { 'Name': f, 'Age': File_Age, 'AgeString': Age_String} )
+
+        # Prepare the list by sorting by recently modified first
+        File_List = sorted(File_List, key=lambda x: x['Age'])
+
+        # Limit the number of entries on the list
+        if len( File_List ) > Max_Files:
+            File_List = File_List[0:Max_Files]
+
+        for e in File_List:
+            # current_app.logger.debug("File: {} age: {}".format( e['Name'], e['Age']/(60*60), e['AgeString'] ))
+            Menu_HTML += Log_File_Pulldown_HTML.format(
+                file      = e['Name'],
+                note      = e['AgeString']
+                )
+
+    return Menu_HTML
+
+#==============================================================================
 # Process_Data_For_GUI - 
 #==============================================================================
 def Process_Data_For_GUI( Scrape_Data, Device ):
@@ -718,9 +847,12 @@ def Process_Data_For_GUI( Scrape_Data, Device ):
     # Get the UPS dictionary from the raw structure
     #===========================================================
     UPS = format_to_text.Get_UPS( Scrape_Data, Device )
+    current_app.logger.debug("Process_Data_For_GUI: UPS dictionary {} target Device {}".format( UPS, Device ))
     if not UPS:
-        current_app.logger.warning("Could not find device {} scrape data".format( Device ))
+        current_app.logger.warning("Could not find device {} in scrape data".format( Device ))
         return {}
+    else:
+        current_app.logger.debug("Found device {} in scrape data".format( Device ))
 
     #===========================================================
     # Status block

@@ -207,16 +207,28 @@
         </div>
       </div>
       <div class="modal-body">
+        <div class="d-flex flex-column m-1">
+          <div class="d-flex">
+            <div class="d-flex flex-column flex-fill">
+              <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
+                <i class="bi bi-paypal fs-3"></i> Like this app? <br>Then why not buy me a coffee?
+              </a>
+            </div>
+            <div class="d-flex flex-column flex-fill align-items-end">
+              <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
+                <img src="/static/images/paypal_donate.jpg" class="rounded float-end" 
+            width="100" height="100"  alt="Like the app? Then why not buy me a coffee.">
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
         Credits:<br>
         <a href="https://www.flaticon.com/free-icons/oaknut" title="oaknut icons">Oaknut icon by Dreamcreateicons</a><br>
         <a href="https://icons.getbootstrap.com/" title="Bootstrap">Bootstrap & Icons</a>
       </div>
-      <div class="modal-body">
-        <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
-          <i class="bi bi-paypal fs-3"></i> Like this app? <br>Then why not buy me a coffee?
-          <img src="/static/images/paypal_donate.jpg" class="rounded float-end" 
-            width="100" height="100"  alt="Like the app? Then why not buy me a coffee."></a>
-      </div>
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <!-- <a href="https://www.flaticon.com/free-icons/oaknut" title="oaknut icons">Oaknut icons created by Dreamcreateicons - Flaticon</a> -->
@@ -235,8 +247,9 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        The default server from the configuration file is being used.<br><br>To specify another server you need to have both the parameters <code>addr</code> and <code>dev</code> to specify the server address and the device name<br><br>
-        <code>http://(nutcase-ip)?addr=x.x.x.x&dev=(ups-name)</code>
+        The server addess and device name were not given on the URL and no default server was found in the configuration file.<br><br>To specify a server on the URL you need to use both the parameters <code>addr</code> and <code>dev</code> e.g.<br><br>
+        <code>http://nutcase-ip:nutcase-port?addr=x.x.x.x&dev=ups-name</code><br><br>
+        To set a default server in the configuration file please see the <a href="https://github.com/ArthurMitchell42/nutcase/wiki/The-Configuration-File" target="_blank">project Wiki</a>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -266,6 +279,8 @@
 
 <script>
 //======================================
+  const Enable_Debug = false
+
 // Enable all tool tips
 // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
 // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
@@ -276,8 +291,9 @@
   var Port = ''
   var Mode = ''
   var Device = ''
-  const HTML_No_Default = '<div class="d-flex fs-6 justify-content-center main-data">Address and/or device not set on URL and no default server set in config</div>'
-  const HTML_No_Comms   = '<div class="d-flex fs-6 justify-content-center main-data">Could not contact UPS server</div>'
+  const HTML_No_Default       = '<div class="d-flex fs-6 justify-content-center main-data">Address and/or device not set on URL and no default server set in config</div>'
+  const HTML_No_Server_Comms  = '<div class="d-flex fs-6 justify-content-center main-data">Could not contact UPS server</div>'
+  const HTML_No_Nutcase_Comms = '<div class="d-flex fs-6 justify-content-center main-data">Could not contact UPS server</div>'
 
   window.addEventListener('DOMContentLoaded', () => {
     let params = (new URL(document.location)).searchParams;
@@ -285,17 +301,16 @@
     Port   = params.get("port");
     Device = params.get("dev");
     Mode   = params.get("mode");
+    console.log("NUTCase addEventListener URL query: Addr " + Addr + " Port " + Port + " Device " + Device + " Mode " + Mode)
 
     if (Addr === null || Device === null) {
-      // console.log("Get default from API")
-      document.getElementById("icon-navbar-warning").classList.remove("d-none")
-
+      console.log("Get default from API")
+  
       $.getJSON( "/api/default", function(data) {
-          // console.log("Default server info: " + data + " " + data.addr + " " + data.port  + " " + data.device )
+          // console.log("Got default server info: " + data + " " + data.addr + " " + data.port  + " " + data.device )
           if (data.device) {
               Device = data.device;
             }
-
           if (data.addr) {
               Addr = data.addr;
               if (data.port) {
@@ -304,24 +319,28 @@
             } 
         })
         .done(function() {
-          // console.log( "second success" );
+          console.log( "Call /api/default success. Got default server info: " + Addr + " Device " + Device );
           if (Addr && Device) {
-            updateStatus("#ph_debug")
+            updateStatus("ph_debug")
             return            
           } else {
             document.getElementById("ph-main-status").innerHTML = HTML_No_Default
-            return            
+            document.getElementById("icon-navbar-warning").classList.remove("d-none")
+          return            
           }
         })
         .fail(function() {
-          document.getElementById("ph-main-status").innerHTML = HTML_No_Default
+          console.log( "Call /api/default failed" );
+          document.getElementById("ph-main-status").innerHTML = HTML_No_Nutcase_Comms
           return
         });
         // .always(function() {
         //   console.log( "complete" );
         // });
-      } else {
-        updateStatus("#ph_debug")
+      } 
+      else {
+        console.log( "Using URL query values " + Addr + " Port " + Port + " Device " + Device );
+        updateStatus("ph_debug")
       }
   })
 
@@ -330,6 +349,11 @@
 //=================================================
 function updateStatus(selector) {
     API_Call = '/api/status' 
+
+    //=================================================
+    // Hide any open tool tips so they don't persist
+    //=================================================
+    $('[data-bs-toggle="tooltip"], .tooltip').tooltip("hide");
 
     if (Addr && Device) { 
       API_Call += '?addr=' + Addr + '&dev=' + Device
@@ -343,17 +367,20 @@ function updateStatus(selector) {
       return
     }
 
+    if (selector !== '' && Enable_Debug == true ) {
+      document.getElementById(selector).innerHTML = "Addr " + Addr + " Device " + Device
+    }
+
     $.getJSON(API_Call, function(data){
       if (Object.keys(data).length == 0) {
-        document.getElementById("ph-main-status").innerHTML = HTML_No_Comms
+        document.getElementById("ph-main-status").innerHTML = HTML_No_Server_Comms
         heartBeat("error")
         return           
       }
       heartBeat("beat")
     })
     .done(function(data) {
-      if (Object.keys(data).length == 0) {
-        return }
+      if (Object.keys(data).length == 0) { return }
 
 // Device pull down
       document.getElementById("ph-download-menu").innerHTML = data.download_menu
@@ -465,7 +492,8 @@ function updateStatus(selector) {
       runtime_chart_obj.update();
     })
     .fail(function() {
-      document.getElementById("ph-main-status").innerHTML = HTML_No_Comms
+      console.log( "Call /api/status failed" );
+      document.getElementById("ph-main-status").innerHTML = HTML_No_Nutcase_Comms
       heartBeat("error")
     });
     // .always(function() {
@@ -473,7 +501,7 @@ function updateStatus(selector) {
     // });
     }
 
-  setInterval('updateStatus("#ph_debug")', 1000 * 20); // Units: ms
+  setInterval('updateStatus("ph_debug")', 1000 * 20); // Units: ms
 
 </script>
 

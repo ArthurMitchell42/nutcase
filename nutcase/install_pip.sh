@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
-pip install flask
-pip install python-dotenv
-pip install pyyaml
-pip install flask_wtf
+pip install -U flask
+pip install -U python-dotenv
+pip install -U pyyaml
+pip install -U flask_wtf
+pip install -U arrow

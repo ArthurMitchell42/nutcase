@@ -6,9 +6,9 @@ import re
 import time
 
 # from app.api import scrape
-from app.api import format_to_text
-from app.api import apc_to_nut
-from app.api import rework_data
+from app.utils import format_to_text
+from app.utils import apc_to_nut
+from app.utils import rework_data
 
 # Test_Data_Back_UPS_ES_700G = [
 #     "APC      : 001,034,0853",

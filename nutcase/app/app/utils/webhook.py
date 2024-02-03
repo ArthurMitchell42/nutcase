@@ -43,8 +43,11 @@ def Call_URL( app, URL ):
 def Refactor_URL_Query( Hook, Refactor ):
     Parsed_URL_tup = urlsplit(Hook)                                  # Split the URL into components
     Query = parse_qs( Parsed_URL_tup.query, keep_blank_values=True ) # Split the query value pairs
-    for r in Refactor:                                               # Change/add queries to the URL
-        Query[ r ] = [ Refactor[r] ]                                 # from the Refactor dictionary
+    
+    Query.update( Refactor )            # Change/add queries to the URL from the Refactor dictionary
+
+    # for r in Refactor:                                               # Change/add queries to the URL
+    #     Query[ r ] = [ Refactor[r] ]                                 # from the Refactor dictionary
 
     Parsed_URL     = list( Parsed_URL_tup )                          # Make the components mutable
     Parsed_URL[3]  = urlencode(Query, doseq=True)                    # Put the query back together

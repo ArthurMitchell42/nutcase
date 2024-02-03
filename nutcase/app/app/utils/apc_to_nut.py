@@ -2,7 +2,7 @@ from flask import current_app
 
 import re
 
-from app.api import format_to_text
+from app.utils import format_to_text
 
 Constants_STATFLAG = [
 # /* bit values for APC UPS Status Byte (ups->Status) */ 

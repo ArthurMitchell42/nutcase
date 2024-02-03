@@ -2,10 +2,10 @@ from flask import current_app
 
 from ipaddress import ip_address    # For parsing target addresses
 
-from app.api import nut_server_handler
-from app.api import apc_server_handler
-from app.api import cache_control
-from app.api import webhook
+from app.utils import nut_server_handler
+from app.utils import apc_server_handler
+from app.utils import cache_control
+from app.utils import webhook
 
 #====================================================================================================
 # Utility to parse and validate the target IP and port

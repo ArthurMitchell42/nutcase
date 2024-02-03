@@ -5,13 +5,14 @@ version: '3.9'
 #========================================
 services:
   nutcase:
-    image: kronos443/nutcase:latest
+    image: kronos443/nutcase:latest-beta  #  V0.3.0Beta1 # latest  # V0.2.0  # v0.2.0-beta3  # V0.2.0_Beta # apcbeta # latest
     container_name: NUTCase
-    restart: unless-stopped    
+    restart: unless-stopped  # "no" always on-failure unless-stopped    
     hostname: NUTCase
-    # network_mode: host
-    ports:
-      - "$NUTEXPORT_PORT:9995"
+    # user: "$PUID:$PGID"
+    network_mode: host
+    # ports:
+    #   - "$NUTEXPORT_PORT:9995"
     volumes:
       - '$DOCKER_DIR/nutcase:/config'
     environment:
