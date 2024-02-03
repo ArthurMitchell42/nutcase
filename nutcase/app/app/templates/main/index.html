@@ -1,0 +1,508 @@
+{% extends "bootstrap/bs5_base_top_navbar.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+<main>
+<!--============================================ Popup Shows ============================================-->
+<div class="collapse mb-1" id="info-data">
+  <div class="container-fluid mt-1 rounded">
+    <div class="alert alert-success  alert-dismissible" role="alert">
+      <h4 class="alert-heading">Detailed Information.</h4>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <div class="d-flex justify-content-around mx-2">
+        <span class="small">Server Address:<br><span id="ph-server-addr">------</span></span>
+        <span class="small">Server Port:<br><span id="ph-server-port">------</span></span>
+        <span class="small">Server Version:<br><span id="ph-server-ver">------</span></span>
+      </div>
+      <hr>
+      <h4 class="alert-heading">Server Clients.</h4>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <div class="d-flex justify-content-around mx-2">
+        <span class="small">UPS Device:<br><span id="ph-ups-device">------</span></span>
+        <span class="small">Clients:<br><span id="ph-client-cnt">------</span></span>
+        <span class="small">Client Addresses:<br><span id="ph-client-list">------</span></span>
+      </div>
+    </div>
+  </div>      
+</div>
+
+<!--============================================ Main body ============================================-->
+  <!-- Main status & Dougnuts -->
+  <div class="container-fluid">
+    <div class="row mt-1 mb-1 gx-2">
+      <div class=" mb-1 col-12 col-md-8 col-lg-8 col-xl-8 col-xxl-4">
+        <div class="bg-gradient bg-info-subtle rounded-2">
+<!-- Status block -->
+<div class="bg-gradient bg-info-subtle rounded-2">
+  <div class="accordion" id="statusaccord">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+        <button class="accordion-button py-2 bg-gradient bg-info-subtle" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+          Status <span class="small text-muted">&nbsp-&nbsp<span id="ph-server-summary"></span></span>
+        </button>
+      </h2>
+  <div class="d-flex border-bottom border-info-subtle g-0 pt-1">
+    <div class="d-flex flex-column justify-content-center px-3">
+      <i class="bi bi-heart-fill fs-3 text-secondary" id="heartbeat" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="Heartbeat for comms with UPS"></i>
+    </div>
+
+    <div class="d-flex flex-column flex-fill" id="ph-main-status">
+      <div class="d-flex">
+        <div class="d-flex flex-fill align-items-center justify-content-end main-data">
+          --------
+        </div>
+        <div class="d-flex px-3 align-items-center">
+          <i class="bi bi-plugin text-secondary fs-3"></i>
+        </div>
+        <div class="d-flex px-3 align-items-center">
+          <span class="fs-4"><i class="bi bi-question-circle text-secondary"></i></span>
+        </div>
+      </div>
+      <div class="d-flex">
+        <div class="d-flex flex-fill align-items-center justify-content-end main-data">
+          --------
+        </div>
+        <div class="d-flex px-3 align-items-center">
+          <i class="bi bi-battery main-icon active fs-3"></i>
+        </div>
+        <div class="d-flex px-3 align-items-center">
+          <span class="fs-4"><i class="bi bi-question-circle text-secondary"></i></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-0">
+      <div class="col-6">
+          <div class="d-flex px-2 main-title">
+            Run Time
+          </div>
+          <div class="d-flex flex-fill fs-4 justify-content-center main-data" id ="ph-runtime">
+            -h --m --s
+          </div>
+      </div>
+      <div class="col-6">
+        <div class="col-6 px-1 main-title">
+            Sounder
+        </div>
+        <div class="d-flex flex-fill" id="ph-sounder">
+            <div class="d-flex fs-2 flex-fill justify-content-around">
+                <div><i class="bi bi-volume-up-fill main-icon"></i></div> 
+                <div><i class="bi bi-volume-off-fill main-icon"></i></div>
+                <div><i class="bi bi-volume-mute-fill main-icon"></i></div>
+            </div>
+            <div class="d-flex flex-fill justify-content-center align-items-center main-data">
+                -------
+            </div>
+        </div>
+      </div>
+  </div>
+
+<div id="collapseOne" class="accordion-collapse bg-gradient bg-info-subtle collapse" data-bs-parent="#accordionExample"> <!--  show -->
+  <div class="accordion-body">
+    <div class="row g-0 py-1">
+      <div class="col-4 px-3 pb-2 small border-end border-info-subtle">ups.status:<br><span id="ph-ups-status">------</span></div>
+      <div class="col-4 px-3 pb-2 small border-end border-info-subtle">ups.temperature:<br><span id="ph-ups-temperature">------</span></div>
+      <div class="col-4 px-3 pb-2 small">UPS Model:<br><span id="ph-ups-model">------</span></div>
+      <div class="col-4 px-3 pb-2 small border-end border-info-subtle">APC STATUS:<br><span id="ph-apc-status">------</span></div>
+      <div class="col-4 px-3 pb-2 small border-end border-info-subtle">APC BCHARGE:<br><span id="ph-apc-bcharge">------</span></div>
+      <div class="col-4 px-3 pb-2 small">APC STATFLAG:<br><span id="ph-apc-statflag">------</span></div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Dougnut blocks -->
+        </div>
+      </div>
+      <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <div class="px-1 pb-1 mx-0 mt-0 mb-1 bg-gradient bg-warning-subtle border border-secondary-subtle rounded-2">
+          <div class="chart-container d-flex justify-content-center align-items-center" style="height: 195px">
+            <canvas id="dougnut_input_voltage"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <div class="px-1 pb-1 mx-0 mt-0 mb-1 bg-gradient bg-info-subtle border border-secondary-subtle rounded-2">
+          <div class="chart-container d-flex justify-content-center align-items-center" style="height: 195px">
+            <canvas id="dougnut_battery_charge"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <div class="px-1 pb-1 mx-0 mt-0 mb-1 bg-gradient bg-success-subtle border border-secondary-subtle rounded-2">
+          <div class="chart-container d-flex justify-content-center align-items-center" style="height: 195px">
+            <canvas id="dougnut_power"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-2">
+        <div class="px-1 pb-1 mx-0 mt-0 mb-1 bg-gradient bg-success-subtle border border-secondary-subtle rounded-2">
+          <div class="chart-container d-flex justify-content-center align-items-center" style="height: 195px">
+            <canvas id="dougnut_battery_voltage"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="container-fluid">
+    <div class="row gx-2">
+      <div class="mt-1 col-12 col-lg-6 col-xl-6">
+        <div class="px-2 bg-gradient bg-warning-subtle border border-secondary-subtle rounded-2">
+          <div class="chart-container d-flex justify-content-center align-items-center" style="height: var(--chart-height);">
+            <canvas id="chart_input_voltage"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="mt-1 col-12 col-lg-6 col-xl-6">
+        <div class="px-2 bg-gradient bg-info-subtle border border-secondary-subtle rounded-2">
+          <div class="chart-container d-flex justify-content-center align-items-center" style="height: var(--chart-height);">
+            <canvas id="chart_battery_charge"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="mt-1 col-12 col-lg-6 col-xl-6">
+        <div class="px-2 bg-gradient bg-success-subtle border border-secondary-subtle rounded-2">
+          <div class="chart-container d-flex justify-content-center align-items-center" style="height: var(--chart-height)";>
+            <canvas id="chart_power"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="mt-1 col-12 col-lg-6 col-xl-6">
+        <div class="px-2 bg-gradient bg-danger-subtle border border-secondary-subtle rounded-2">
+          <div class="chart-container d-flex justify-content-center align-items-center" style="height: var(--chart-height);">
+            <canvas id="chart_runtime"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--============================================ Help Modal ============================================-->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="/static/favicon.ico" alt="NUTCase" style="width:64px;height:64px;">
+        <h5 class="modal-title" id="helpLabel">NUTCase Main Page Help</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Icons:<br>
+        <div class="px-2">
+        <i class="bi bi-download"></i> - Download the JSON, Metrics or raw JSON for diagnostics<br>
+        <i class="bi bi-house-fill"></i> - Home page (Dashboard)<br>
+        <i class="bi bi-clipboard2-pulse-fill"></i> - Log files<br>
+        <i class="bi bi-info-circle-fill"></i> - Server details<br>
+        <i class="bi bi-github"></i> - NUTCase on GitHub<br>
+        <i class="bi bi-book"></i> - Quick usage help<br>
+        <i class="bi bi-question-circle-fill"></i> - Page help<br>
+        <i class="bi bi-sun-fill"></i> / <i class="bi bi-moon-stars-fill"></i> - Theme selection<br>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex flex-column m-1">
+          <div class="d-flex">
+            <div class="d-flex flex-column flex-fill">
+              <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
+                <i class="bi bi-paypal fs-3"></i> Like this app? <br>Then why not buy me a coffee?
+              </a>
+            </div>
+            <div class="d-flex flex-column flex-fill align-items-end">
+              <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
+                <img src="/static/images/paypal_donate.jpg" class="rounded float-end" 
+            width="100" height="100"  alt="Like the app? Then why not buy me a coffee.">
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        Credits:<br>
+        <a href="https://www.flaticon.com/free-icons/oaknut" title="oaknut icons">Oaknut icon by Dreamcreateicons</a><br>
+        <a href="https://icons.getbootstrap.com/" title="Bootstrap">Bootstrap & Icons</a>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <!-- <a href="https://www.flaticon.com/free-icons/oaknut" title="oaknut icons">Oaknut icons created by Dreamcreateicons - Flaticon</a> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--============================================ Warning Modal ============================================-->
+<div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="/static/favicon.ico" alt="NUTCase" style="width:64px;height:64px;">
+        <h5 class="modal-title" id="warningLabel">Warning</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        The server addess and device name were not given on the URL and no default server was found in the configuration file.<br><br>To specify a server on the URL you need to use both the parameters <code>addr</code> and <code>dev</code> e.g.<br><br>
+        <code>http://nutcase-ip:nutcase-port?addr=x.x.x.x&dev=ups-name</code><br><br>
+        To set a default server in the configuration file please see the <a href="https://github.com/ArthurMitchell42/nutcase/wiki/The-Configuration-File" target="_blank">project Wiki</a>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+{% endblock %}
+
+{% block script %}
+<script src="/static/js/heartbeat.js"></script> 
+
+<script src="/static/chart.js/dist/chart.umd.js"></script> 
+<script src="/static/chart.js/dist/plugins/chartjs-plugin-annotation.js"></script>
+
+<script src="/static/js/dougnut_battery_voltage.js"></script> 
+<script src="/static/js/dougnut_battery_charge.js"></script> 
+<script src="/static/js/dougnut_input_voltage.js"></script> 
+<script src="/static/js/dougnut_power.js"></script> 
+<script src="/static/js/chart_battery_charge.js"></script> 
+<script src="/static/js/chart_input_voltage.js"></script> 
+<script src="/static/js/chart_power.js"></script> 
+<script src="/static/js/chart_runtime.js"></script>
+<!-- <script src="/static/js/screen_size.js"></script> -->
+
+<script>
+//======================================
+  const Enable_Debug = false
+
+// Enable all tool tips
+// const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+// const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+  var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+  var Addr = ''
+  var Port = ''
+  var Mode = ''
+  var Device = ''
+  const HTML_No_Default       = '<div class="d-flex fs-6 justify-content-center main-data">Address and/or device not set on URL and no default server set in config</div>'
+  const HTML_No_Server_Comms  = '<div class="d-flex fs-6 justify-content-center main-data">Could not contact UPS server</div>'
+  const HTML_No_Nutcase_Comms = '<div class="d-flex fs-6 justify-content-center main-data">Could not contact UPS server</div>'
+
+  window.addEventListener('DOMContentLoaded', () => {
+    let params = (new URL(document.location)).searchParams;
+    Addr   = params.get("addr");
+    Port   = params.get("port");
+    Device = params.get("dev");
+    Mode   = params.get("mode");
+    console.log("NUTCase addEventListener URL query: Addr " + Addr + " Port " + Port + " Device " + Device + " Mode " + Mode)
+
+    if (Addr === null || Device === null) {
+      console.log("Get default from API")
+  
+      $.getJSON( "/api/default", function(data) {
+          // console.log("Got default server info: " + data + " " + data.addr + " " + data.port  + " " + data.device )
+          if (data.device) {
+              Device = data.device;
+            }
+          if (data.addr) {
+              Addr = data.addr;
+              if (data.port) {
+                Port = data.port;
+              }
+            } 
+        })
+        .done(function() {
+          console.log( "Call /api/default success. Got default server info: " + Addr + " Device " + Device );
+          if (Addr && Device) {
+            updateStatus("ph_debug")
+            return            
+          } else {
+            document.getElementById("ph-main-status").innerHTML = HTML_No_Default
+            document.getElementById("icon-navbar-warning").classList.remove("d-none")
+          return            
+          }
+        })
+        .fail(function() {
+          console.log( "Call /api/default failed" );
+          document.getElementById("ph-main-status").innerHTML = HTML_No_Nutcase_Comms
+          return
+        });
+        // .always(function() {
+        //   console.log( "complete" );
+        // });
+      } 
+      else {
+        console.log( "Using URL query values " + Addr + " Port " + Port + " Device " + Device );
+        updateStatus("ph_debug")
+      }
+  })
+
+//=================================================
+// Update the current data
+//=================================================
+function updateStatus(selector) {
+    API_Call = '/api/status' 
+
+    //=================================================
+    // Hide any open tool tips so they don't persist
+    //=================================================
+    $('[data-bs-toggle="tooltip"], .tooltip').tooltip("hide");
+
+    if (Addr && Device) { 
+      API_Call += '?addr=' + Addr + '&dev=' + Device
+      if (Port) { 
+        API_Call += '&port=' + Port 
+        }
+      if (Mode) { 
+        API_Call += '&mode=' + Mode 
+      }
+    } else {
+      return
+    }
+
+    if (selector !== '' && Enable_Debug == true ) {
+      document.getElementById(selector).innerHTML = "Addr " + Addr + " Device " + Device
+    }
+
+    $.getJSON(API_Call, function(data){
+      if (Object.keys(data).length == 0) {
+        document.getElementById("ph-main-status").innerHTML = HTML_No_Server_Comms
+        heartBeat("error")
+        return           
+      }
+      heartBeat("beat")
+    })
+    .done(function(data) {
+      if (Object.keys(data).length == 0) { return }
+
+// Device pull down
+      document.getElementById("ph-download-menu").innerHTML = data.download_menu
+      
+// Status area
+      document.getElementById("ph-main-status").innerHTML = data.status
+      document.getElementById("ph-runtime").innerHTML = data.runtime
+      document.getElementById("ph-sounder").innerHTML = data.sounder
+// Info pop-up
+      document.getElementById("ph-server-addr").innerHTML = Addr
+      if (Port) {
+        document.getElementById("ph-server-port").innerHTML = Port
+      } else {
+        document.getElementById("ph-server-port").innerHTML = "Default (3493)" 
+      }
+      document.getElementById("ph-server-ver").innerHTML = data.server_version
+      
+      document.getElementById("ph-ups-device").innerHTML = Device
+      document.getElementById("ph-client-cnt").innerHTML = data.client_cnt
+      document.getElementById("ph-client-list").innerHTML = data.client_list
+// Status header
+      document.getElementById("ph-server-summary").innerHTML = data.server_summary
+// Status pop-up
+      document.getElementById("ph-ups-status").innerHTML = data.ups_status
+      document.getElementById("ph-ups-temperature").innerHTML = data.ups_temp
+      document.getElementById("ph-ups-model").innerHTML = data.ups_model
+      document.getElementById("ph-apc-status").innerHTML = data.apc_status
+      document.getElementById("ph-apc-bcharge").innerHTML = data.apc_bcharge
+      document.getElementById("ph-apc-statflag").innerHTML = data.apc_statflag
+
+      tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+// Input voltage dougnut
+      var in_volt = data.input_volts.map(function(item) { return parseFloat(item, 10); });
+      dougnut_input_voltage_obj.data.datasets[0].data = in_volt;
+      dougnut_input_voltage_obj.options.plugins.annotation.annotations.label1.content[0] = in_volt[0] + 'V';
+      in_volt = data.input_scale.map(function(item) { return parseFloat(item, 10); });
+      dougnut_input_voltage_obj.data.datasets[1].data = in_volt;
+      in_volt = data.input_nom.map(function(item) { return parseFloat(item, 10); });
+      dougnut_input_voltage_obj.data.datasets[2].data = in_volt;
+      dougnut_input_voltage_obj.update();
+
+// Battery charge dougnut
+      var bat_ch = data.bat_charge.map(function(item) { return parseFloat(item, 10); });
+      dougnut_battery_charge_obj.data.datasets[0].data = bat_ch;
+      dougnut_battery_charge_obj.options.plugins.annotation.annotations.label1.content[0] = bat_ch[0] + '%';
+      bat_ch = data.bat_ch_scale.map(function(item) { return parseFloat(item, 10); });
+      dougnut_battery_charge_obj.data.datasets[1].data = bat_ch;
+      dougnut_battery_charge_obj.update();
+
+// Battery voltage dougnut
+      var bat_volt = data.bat_volts.map(function(item) { return parseFloat(item, 10); });
+      dougnut_battery_voltage_obj.data.datasets[0].data = bat_volt;
+      dougnut_battery_voltage_obj.options.plugins.annotation.annotations.label1.content[0] = bat_volt[0] + 'V';
+      bat_volt = data.bat_v_scale.map(function(item) { return parseFloat(item, 10); });
+      dougnut_battery_voltage_obj.data.datasets[1].data = bat_volt;
+      bat_volt = data.bat_v_nom.map(function(item) { return parseFloat(item, 10); });
+      dougnut_battery_voltage_obj.data.datasets[2].data = bat_volt;
+      dougnut_battery_voltage_obj.update();
+
+// Output power dougnut
+      var power_out = data.power_out.map(function(item) { return parseFloat(item, 10); });
+      power_dougnut_obj.data.datasets[0].data = power_out.slice(0, 2);
+      power_dougnut_obj.options.plugins.annotation.annotations.label1.content = [power_out[2] + 'W', power_out[0] + '%'];
+      power_out = data.power_out_scale.map(function(item) { return parseFloat(item, 10); });
+      power_dougnut_obj.data.datasets[1].data = power_out;
+      power_dougnut_obj.update();
+
+// Input voltage chart
+      var in_volt_x = data.time_axis_data // in_volt_x;
+      var in_volt_y = data.in_volt_y.map(function(item) { return parseFloat(item, 10); });
+      chart_input_voltage_obj.data.labels = in_volt_x;
+      chart_input_voltage_obj.data.datasets[0].data = in_volt_y;
+      chart_input_voltage_obj.options.scales.y.max = data.in_volt_max
+      chart_input_voltage_obj.options.scales.y.min = data.in_volt_min
+      chart_input_voltage_obj.update();
+
+// Bat charge chart
+      var bat_ch_x = data.time_axis_data // data.bat_ch_x;
+      var bat_ch_y = data.bat_ch_y.map(function(item) { return parseFloat(item, 10); });
+      chart_battery_charge_obj.data.labels = bat_ch_x;
+      chart_battery_charge_obj.data.datasets[0].data = bat_ch_y;
+      chart_battery_charge_obj.update();
+
+// Output power chart
+      var out_power_x = data.time_axis_data // data.out_power_x;
+      var out_power_y = data.out_power_y.map(function(item) { return parseFloat(item, 10); });
+      chart_power_obj.data.labels = out_power_x;
+      chart_power_obj.data.datasets[0].data = out_power_y;
+
+      chart_power_obj.options.scales.y.max = data.out_power_y_max
+      chart_power_obj.options.scales.y.min = data.out_power_y_min
+
+      chart_power_obj.options.scales.y1.max = data.out_power_watts_max
+      chart_power_obj.options.scales.y1.min = data.out_power_watts_min
+
+      chart_power_obj.update();
+
+// Runtime chart
+      var runtime_x = data.time_axis_data // data.runtime_x;
+      var runtime_y = data.runtime_y.map(function(item) { return parseFloat(item, 10); });
+      runtime_chart_obj.data.labels = runtime_x;
+      runtime_chart_obj.data.datasets[0].data = runtime_y;
+
+      runtime_chart_obj.options.scales.y.max = data.runtime_y_max
+      runtime_chart_obj.options.scales.y.min = data.runtime_y_min
+
+      runtime_chart_obj.update();
+    })
+    .fail(function() {
+      console.log( "Call /api/status failed" );
+      document.getElementById("ph-main-status").innerHTML = HTML_No_Nutcase_Comms
+      heartBeat("error")
+    });
+    // .always(function() {
+    //   console.log( "complete" );
+    // });
+    }
+
+  setInterval('updateStatus("ph_debug")', 1000 * 20); // Units: ms
+
+</script>
+
+{% endblock %}

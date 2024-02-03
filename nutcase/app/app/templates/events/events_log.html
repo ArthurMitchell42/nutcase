@@ -1,0 +1,112 @@
+{% extends "bootstrap/bs5_base_top_navbar.html" %}
+
+{% block head %}{% endblock %}
+
+{% block content %}
+<main>
+
+<div class="container mt-1 rounded">
+
+
+  <div class="d-flex flex-column flex-fillm-0">
+    <div class="d-flex align-content-center justify-content-between">
+
+      <div class="d-flex d-grid gap-2">
+        <button class="btn btn-sm btn-success" type="button" onclick="Submit_Action('clear')"><i class="bi bi-x-square-fill"></i> Clear</button>
+        <button class="btn btn-sm btn-success" type="button" onclick="Submit_Action('reset')"><i class="bi bi-check2-all"></i> Mark read</button>
+      </div>
+
+
+      <div class="d-flex">
+        <form action = "" method = "POST" id="event_form" enctype = "multipart/form-data">
+          {{ form.hidden_tag() }}
+          {{ form.Event_Level.label(class="form-label small text-muted p-0 m-0") }}
+          {{ form.Event_Level(class='btn btn-secondary btn-sm', onchange="Submit_Action('redraw')") }}
+          {{ form.Lines_Per_Page.label(class="form-label small text-muted p-0 m-0") }}
+          {{ form.Lines_Per_Page(class='btn btn-secondary btn-sm', onchange="Submit_Action('redraw')") }}
+        </form>
+      </div> 
+    </div>
+
+    <div class="d-flex align-content-center justify-content-center pt-2">
+      <ul class="pagination pagination-sm mb-0">
+        {{pagination_block}}
+      </ul>
+    </div>
+
+  </div>
+
+  <table class="table table-sm table-responsive table-hover table-striped" data-bs-theme=''>
+  {{event_table}}
+  </table>
+
+</div>
+
+<!--============================================ Help Modal ============================================-->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="/static/favicon.ico" alt="NUTCase" style="width:64px;height:64px;">
+        <h5 class="modal-title" id="helpLabel">NUTCase Events Help</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        This feature is not implemented yet<br>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex flex-column m-1">
+          <div class="d-flex">
+            <div class="d-flex flex-column flex-fill">
+              <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
+                <i class="bi bi-paypal fs-3"></i> Like this app? <br>Then why not buy me a coffee?
+              </a>
+            </div>
+            <div class="d-flex flex-column flex-fill align-items-end">
+              <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
+                <img src="/static/images/paypal_donate.jpg" class="rounded float-end" 
+            width="100" height="100"  alt="Like the app? Then why not buy me a coffee.">
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        Credits:<br>
+        <a href="https://www.flaticon.com/free-icons/oaknut" title="oaknut icons">Oaknut icon by Dreamcreateicons</a><br>
+        <a href="https://icons.getbootstrap.com/" title="Bootstrap">Bootstrap & Icons</a>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+{% endblock %}
+
+{% block script %}
+<script>
+
+function Submit_Action( Action ) {
+   console.log("Submit " + Action);
+   var hidden = document.createElement("input");
+   hidden.type = "hidden";
+   hidden.name = "action";
+   hidden.value = Action;
+   form_el = document.getElementById("event_form");
+   form_el.appendChild(hidden);
+   form_el.submit();   
+}
+
+// function Change_Level() {
+//   console.log("Change_Level");
+// }
+
+// function Change_LPP() {
+//   console.log("Change_LPP");
+// }
+
+</script>
+{% endblock %}

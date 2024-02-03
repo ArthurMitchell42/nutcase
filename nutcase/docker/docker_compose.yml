@@ -1,0 +1,34 @@
+---
+version: '3.9'
+#========================================
+# Sevices
+#========================================
+services:
+  nutcase:
+    image: kronos443/nutcase:latest-beta  #  V0.3.0Beta1 # latest  # V0.2.0  # v0.2.0-beta3  # V0.2.0_Beta # apcbeta # latest
+    container_name: NUTCase
+    restart: unless-stopped  # "no" always on-failure unless-stopped    
+    hostname: NUTCase
+    # user: "$PUID:$PGID"
+    network_mode: host
+    # ports:
+    #   - "$NUTEXPORT_PORT:9995"
+    volumes:
+      - '$DOCKER_DIR/nutcase:/config'
+    environment:
+      TZ: $TZ
+      LOG_LEVEL: DEBUG
+    healthcheck:
+      test: wget --spider -q  http://127.0.0.1:$NUTEXPORT_PORT/help
+      interval: 3m10s
+      timeout: 10s
+      retries: 2
+      start_period: 30s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      #- "com.centurylinklabs.watchtower.enable=false"
+      #- "com.centurylinklabs.watchtower.monitor-only=true"
+      - "com.centurylinklabs.watchtower.monitor-only=false"
+
+
+      

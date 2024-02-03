@@ -1,0 +1,86 @@
+rework:
+  - from: battery.runtime
+    to: nutcase.battery.runtime
+    style: time
+    control: "%Mm %Ss"
+# Other examples are: "%H:%M:%S" or "%-M:%S"
+  - from: ups.status
+    to: nutcase.ups.status
+    style: simple-enum
+    control: 
+      from: [ "OL", "OB", "LB", "CHRG", "RB", "FSD", "BYPASS", "SD", "CP", "BOOST", "OFF" ]
+      to: [ "On-Line", "On-Bat", "Low-Bat", "Charging", "Replace-Bat", "Force-Shutdown", "Bypass", "Shutdown", "On-Line", "Boost", "Off" ]
+      default: "Other"
+  - from: ups.status
+    to: nutcase.ups.status.composite
+    style: comp-enum
+    control: 
+      from: [ "OL", "OB", "LB", "CHRG", "RB", "FSD", "BYPASS", "SD", "CP", "BOOST", "OFF" ]
+      to: [ "On-Line", "On-Bat", "Low-Bat", "Charging", "Replace-Bat", "Force-Shutdown", "Bypass", "Shutdown", "On-Line", "Boost", "Off" ]
+      default: "Other"
+      # join: "-"
+  - from: ups.load
+    to: nutcase.ups.load.watts
+    style: ratio
+    control: ups.realpower.nominal
+  - from: ups
+    to: nutcase.ups.client-count
+    style: cl-count
+    control: [ "3", 'Missing {d} of {c}', 'Clients OK ({c})', '{d} Extra']
+  - from: ups
+    to: nutcase.ups.client-check
+    style: cl-check
+    control: [ '10.0.10.10', '10.0.10.183', '127.0.0.1' ]
+  - from: eaton3s
+    to: nutcase.ups.client-count
+    style: cl-count
+    control: [ "2", 'Missing {d} of {c}', 'Clients OK ({c})', '{d} Extra']
+  - from: eaton3s
+    to: nutcase.ups.client-check
+    style: cl-check
+    control: [ '10.0.10.178', '127.0.0.1' ]
+webhooks:
+  # default: 
+  #   - http://10.0.10.180:3001/api/push/aaaaaaaaaaaaaaa?status=up&msg=OK&ping= 
+  #   - http://10.0.10.9:3001/api/push/bbbbbbbbbbbbbbbb?status=up&msg=OK&ping=
+  ok:
+    - http://10.0.10.180:3001/api/push/aaaaaaaaaaaaaaa?status=up&msg=OK&ping= 
+    - http://10.0.10.9:3001/api/push/bbbbbbbbbbbbbbbb?status=up&msg=OK&ping=
+  fail: 
+    - http://10.0.10.180:3001/api/push/aaaaaaaaaaaaaaa?status=down&msg=OK&ping=
+    - http://10.0.10.9:3001/api/push/bbbbbbbbbbbbbbbb?status=up&msg=OK&ping=
+# Boolean values: True = True, On and Yes    False = False, Off and No
+settings:
+  log_level: debug
+  order_metrics: True
+  coloured_log: True
+  default_log_lines: 30
+  cache_period: 30
+  apc_strip_units: true
+  ui_format_runtime: "%-Hh %-Mm %Ss"
+servers:
+  - server: "10.0.10.9"
+    port: 3493
+    device: 'ups'
+    default: true
+    power: 550
+    name: 'CyberPower'
+    # username: monuser
+    # password: secret
+  - server: "10.0.10.180"
+    port: 3493
+    device: 'eaton3s'
+    power: 850
+    name: 'Eaton'
+    # username: monuser
+    # password: secret
+  - server: "10.0.10.184"
+    port: 3493
+    device: 'alpha'
+    power: 2000
+  - server: "10.0.10.225"
+    port: 3551
+    device: 'smartups750'
+    mode: 'apc'
+    power: 750
+

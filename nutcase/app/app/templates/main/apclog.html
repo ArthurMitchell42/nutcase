@@ -1,0 +1,43 @@
+{% extends "bootstrap/bs5_base_top_navbar.html" %}
+
+{% block head %}{% endblock %}
+
+{% block content %}
+<main>
+
+<div class="container mt-1 rounded">
+  <div class="d-flex flex-column flex-fill m-0">
+    <div class="d-flex">
+      <div class="d-flex flex-fill align-items-center">
+        <b>Log file page</b>
+      </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button class="btn btn-sm btn-success me-md-2" type="button" onclick="copy_text()"><i class="bi bi-clipboard-check-fill"></i> Copy Log</button>
+        </div>
+    </div>
+  </div>
+  <div class="mt-1 mb-3">
+{% if lines %}
+<textarea class="form-control form-control-sm font-monospace" id="apclogtext" rows="20" readonly>{% for d in lines %}{{d|e}}{% endfor %}</textarea>
+{% else %}
+<pre>Error displaying log</pre>
+{% endif %}
+</div>
+</div>
+</main>
+{% endblock %}
+
+{% block script %}
+<script>
+  function copy_text() {
+    var copyText = document.getElementById("apclogtext");
+    // Select the text field
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // For mobile devices
+    // Copy the text inside the text field
+    navigator.clipboard.writeText(copyText.value);
+    // Alert the copied text
+    alert("Copied the enties to the clipboard");
+  } 
+</script>
+{% endblock %}

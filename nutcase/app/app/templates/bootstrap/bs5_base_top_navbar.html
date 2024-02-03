@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% if title %}
+    <title>{{ title }} - {{ config['APP_NAME'] }}</title>
+    {% else %}
+    <title>{{ config['APP_NAME'] }}</title>
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- <link rel="stylesheet" type="text/css" href="/static/fontawesome/css/all.css"> -->
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="/static/js/theme_switch.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap/bs5_top_nav.css">
+
+<style>
+
+</style>
+
+<!-- <link rel="stylesheet" type="text/css" href="/static/css/bootstrap/bs5_base_top_navbar.css"> -->
+{% block head %}{% endblock %}
+</head>
+<body id="id-html-body" class="cl-body-width">
+
+<script type="text/javascript" src="/static/js/theme_colours.js"></script>
+
+<!-- Top nav bar -->
+<aside id="id-nav-bar">
+  <nav class="navbar navbar-expand-md bg-body-tertiary">    
+    <a class="navbar-brand px-3" href="https://github.com/ArthurMitchell42/nutcase"><img src="/static/favicon.ico" style="width:22px;height:22px;"> {{ config['APP_NAME'] }} <span class="fs-6 text-muted">- V{{ config['APP_VERSION'] }}  {% if config['CONFIG_SET'] != 'Prd' %} {{ config['CONFIG_SET'] }} {% endif %}</span></a> 
+    <div id="ph_debug"></div>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Click for warning</small>">
+          <a class="nav-link d-none" data-bs-toggle="modal" data-bs-target="#warningModal" role="button" id="icon-navbar-warning"><i class="bi bi-exclamation-triangle-fill text-warning"></i></a>          
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-pc-display-horizontal" data-bs-toggle="tooltip_navbar" data-bs-placement="top" data-bs-html="true" data-bs-title="<small>List of your devices</small>"></i>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" id="ph-device-menu">
+            <a class="dropdown-item" href="https://github.com/ArthurMitchell42/nutcase/wiki/The-Configuration-File#3-the-servers-section">None configured</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownDownload" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-download" data-bs-toggle="tooltip_navbar" data-bs-placement="top" data-bs-html="true" data-bs-title="<small>View/download data</small>"></i>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownDownload" id="ph-download-menu">
+            <a class="dropdown-item" href="/">Please go to<br>the home page</a>
+          </div>
+        </li>
+        <li class="nav-item border-start border-secondary-subtle">
+          <a class="nav-link" href="{{ url_for('main.route_index') }}" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Home GUI</small>"><i class="bi bi-house-fill"></i></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('main.route_log') }}" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Log files</small>"><i class="bi bi-clipboard2-pulse-fill"></i></a>
+        </li>
+        <li class="nav-item" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Details</small>">
+          <a class="nav-link" data-bs-toggle="collapse" href="#info-data" role="button"><i class="bi bi-info-circle-fill"></i></a>          
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/ArthurMitchell42/nutcase/wiki" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Manual (GitHub)</small>"><i class="bi bi-github"></i></a>
+        </li>
+        <li class="nav-item" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Usage help</small>">
+          <a class="nav-link" href="{{ url_for('main.route_help') }}"><i class="bi bi-book"></i></a>
+        </li>
+        <li class="nav-item border-end border-secondary-subtle" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Page help</small>">
+          <a class="nav-link" data-bs-toggle="modal" data-bs-target="#helpModal" role="button"><i class="bi bi-question-circle-fill"></i></a>          
+        </li>
+
+
+  <li class="nav-item ps-1" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Events</small>">
+    <a href="{{ url_for('events.route_events_log') }}" style="text-decoration: none;">
+      <span class="nav-link">
+        <i class="bi bi-info-circle position-relative header-icons">
+  {% if config['APP_STATUS_FLAGS'] %}
+  {% if config['APP_STATUS_FLAGS'].info > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill header-icon-pill bg-success">
+          {{ config['APP_STATUS_FLAGS'].info }}
+        </span>
+  {% endif %}
+  {% endif %}
+      </i>
+  </span>
+</a>
+</li>
+  <li class="nav-item" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Events</small>">
+    <a href="{{ url_for('events.route_events_log') }}" style="text-decoration: none;">
+      <span class="nav-link">
+        <i class="bi bi-exclamation-triangle position-relative header-icons">
+  {% if config['APP_STATUS_FLAGS'] %}
+  {% if config['APP_STATUS_FLAGS'].warning > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill header-icon-pill bg-warning" style="font-size: 11px;color: black;">
+          {{ config['APP_STATUS_FLAGS'].warning }}
+        </span>
+  {% endif %}
+  {% endif %}
+      </i>
+  </span>
+</a>
+</li>
+  <li class="nav-item" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Events</small>">
+    <a href="{{ url_for('events.route_events_log') }}" style="text-decoration: none;">
+      <span class="nav-link">
+        <i class="bi bi-bell position-relative header-icons">
+  {% if config['APP_STATUS_FLAGS'] %}
+  {% if config['APP_STATUS_FLAGS'].alert > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill header-icon-pill bg-danger" style="font-size: 11px;">
+          {{ config['APP_STATUS_FLAGS'].alert }}
+        </span>
+  {% endif %}
+  {% endif %}
+      </i>
+  </span>
+</a>
+</li>
+
+        <li class="nav-item ms-2 border-start border-secondary-subtle"">
+          <!-- Theme icon -->
+          <div class="dropdown me-2 bd-mode-toggle" style="padding-top: 0.5rem;">
+            <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
+                id="bd-theme"
+                type="button"
+                aria-expanded="false"
+                data-bs-toggle="dropdown"
+                aria-label="Toggle theme (auto)">
+                <i class="bi bi-sun-fill theme-icon-active"></i>
+                <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                  <i class="bi bi-sun-fill" icn="bi-sun-fill"></i>&nbspLight</button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                  <i class="bi bi-moon-stars-fill" icn="bi-moon-stars-fill"></i>&nbspDark</button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+                  <i class="bi bi-yin-yang" icn="bi-yin-yang"></i>&nbspAuto</button>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</aside>
+
+<!--============================================ Flash messages ============================================-->
+{% include 'bootstrap/flash_message_body.html' %}
+
+<!--============================================ Body messages ============================================-->
+{% include 'bootstrap/body_messages.html' %}
+
+<!-- Central area content supplied by caller -->
+{% block content %}{% endblock %}
+
+<!-- Scripts -->
+<div id="scripts">
+
+    <!-- { { moment.include_moment() } } -->
+    <!-- { { moment.lang(g.locale) } }  -->
+
+    <script type="text/javascript" src="/static/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/popper/popper.min.js"></script>  
+    <script type="text/javascript" src="/static/bootstrap/js/bootstrap.min.js"></script>
+<!--    <script type="text/javascript" src="/static/feather/feather.js"></script>
+    <script>feather.replace()</script>-->
+
+    {% include 'bootstrap/flash_message_script.html' %}
+
+    <!-- <script type="text/javascript" src="/static/js/screen_size.js"></script> -->
+
+<script>
+  var Addr = ''
+  var Device = ''
+
+  window.addEventListener('DOMContentLoaded', () => {
+    let params = (new URL(document.location)).searchParams;
+    Addr   = params.get("addr");
+    Device = params.get("dev");
+
+    API_URL = "/api/devices?addr=" + Addr + "&dev=" + Device
+    $.getJSON( API_URL, function(data) {
+          // console.log("Devices info: " + data )
+          document.getElementById("ph-device-menu").innerHTML = data.device_menu
+        })
+        .done(function(data) {
+          // console.log( "B5_Base devices success" );
+          // document.getElementById("ph-device-menu").innerHTML = data.device_menu
+        })
+        .fail(function() {
+          console.log("No device data after API call")
+          // document.getElementById("ph-main-status").innerHTML = HTML_No_Default
+          return
+        });
+        // .always(function() {
+        //   console.log( "complete" );
+        // });
+  })
+
+//======================================
+// Enable all tool tips
+const tooltipTriggerList_navbar = document.querySelectorAll('[data-bs-toggle="tooltip_navbar"]')
+const tooltipList_navbar = [...tooltipTriggerList_navbar].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+</script>
+
+{% block script %}{% endblock %}
+</div>
+</body>
+</html>
