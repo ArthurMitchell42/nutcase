@@ -367,7 +367,8 @@ def Load_Config( app ):
     #=====================================================================
     # Record the mod time of the config file
     #=====================================================================
-    app.config.update( CONFIG_MOD_TIME = os.path.getmtime( Config_Filename ) )
+    if Config_Filename and os.path.isfile( Config_Filename ):
+        app.config.update( CONFIG_MOD_TIME = os.path.getmtime( Config_Filename ) )
     
     #=================================================================================
     # Do validity checking in the loaded configuration
