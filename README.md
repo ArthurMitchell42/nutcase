@@ -105,6 +105,11 @@ Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker un
 </thead>
 <tbody>
 <tr>
+<td align="left">19/2/2024</td>
+<td align="left">0.3.1</td>
+<td align="left">Fix for start crash Re missing config file</td>
+</tr>
+<tr>
 <td align="left">3/2/2024</td>
 <td align="left">0.3.0</td>
 <td align="left">New GUI and many more features.</td>
