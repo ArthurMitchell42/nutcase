@@ -22,12 +22,12 @@ class Config(object):
     # Core info
     #==================================================================
     APP_NAME              = 'NUTCase'
-    APP_VERSION           = '0.3.0'
+    APP_VERSION           = '0.3.1'
 
     #==================================================================
     # Configuration file
     #==================================================================
-    CONFIG_PATH           = os.path.join(basedir, '../config' ) 
+    CONFIG_PATH           = os.path.join(basedir, '../config' )
     CONFIG_FILE           = APP_NAME.lower()
 
     #==================================================================
@@ -94,7 +94,7 @@ class Config_Development(Config):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'uUwb-C58lzujc3Xn0hZ8c48iHw-VA341'
     DEBUG = True
     TESTING = False
-    
+
 class Config_Production(Config):
     CONFIG_SET = 'Prd'
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'uUwb-C58lzujc3Xn0hZ8c48iHw-VA341'
