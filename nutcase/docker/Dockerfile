@@ -62,13 +62,14 @@ ENV STATIC_INDEX 0
 # Add app
 COPY ./nutcase/app /app
 WORKDIR /app
+RUN rm -rf tests
 
 # RUN apt-get install nano
 RUN apt-get install tzdata
 RUN pip install --no-cache-dir -r requirements.txt
 RUN rm requirements.txt
 
-# Make /app/* available to be imported by Python globally to better support 
+# Make /app/* available to be imported by Python globally to better support
 # several use cases like Alembic migrations.
 ENV PYTHONPATH=/app
 
@@ -78,7 +79,7 @@ RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Run the start script which will check for an /app/prestart.sh script 
-# (e.g. for migrations) and then will start Supervisor, which in turn 
+# Run the start script which will check for an /app/prestart.sh script
+# (e.g. for migrations) and then will start Supervisor, which in turn
 # will start Nginx and uWSGI
 CMD ["/start.sh"]
