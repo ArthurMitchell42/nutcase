@@ -8,7 +8,7 @@ class Events_Form(FlaskForm):
                 (20,    "Info"),
                 (30, "Warning"),
                 (40,   "Alert"),
-                ], 
+                ],
                 # default=('alert', "Alert")
                 coerce=int
                 )
@@ -22,4 +22,3 @@ class Events_Form(FlaskForm):
                 ], coerce=int)
 
     submit = SubmitField('Clear')
-

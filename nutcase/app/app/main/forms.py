@@ -1,16 +1,17 @@
-######from flask import request
+# #####from flask import request
 # from flask_wtf import FlaskForm
-# from wtforms import StringField, SelectField, SubmitField, IntegerField, BooleanField # TextAreaField
+# from wtforms import StringField, SelectField, SubmitField,
+#                       IntegerField, BooleanField # TextAreaField
 # from wtforms import SelectField, SubmitField
 # from wtforms.validators import ValidationError, DataRequired, Length
-######from app.models import User
+# #####from app.models import User
 
 # class Events_Form(FlaskForm):
 #     Event_Level = SelectField(u'Level', choices=[
 #                 (20,    "Info"),
 #                 (30, "Warning"),
 #                 (40,   "Alert"),
-#                 ], 
+#                 ],
 #                 # default=('alert', "Alert")
 #                 coerce=int
 #                 )
