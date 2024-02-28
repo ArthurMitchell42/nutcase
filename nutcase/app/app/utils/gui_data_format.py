@@ -119,7 +119,7 @@ def Time_Axis_Array(Length):
         if x == 0:
             X_Data.append('Now')
         elif x % 10 == 0:
-            X_Data.append('-' + str(x / 2))
+            X_Data.append('-' + str(int(x / 2)) + "m")
         else:
             X_Data.append('')
 

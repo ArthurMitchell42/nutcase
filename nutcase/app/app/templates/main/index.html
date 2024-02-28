@@ -26,7 +26,7 @@
         <span class="small">Client Addresses:<br><span id="ph-client-list">------</span></span>
       </div>
     </div>
-  </div>      
+  </div>
 </div>
 
 <!--============================================ Main body ============================================-->
@@ -47,6 +47,9 @@
   <div class="d-flex border-bottom border-info-subtle g-0 pt-1">
     <div class="d-flex flex-column justify-content-center px-3">
       <i class="bi bi-heart-fill fs-3 text-secondary" id="heartbeat" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="Heartbeat for comms with UPS"></i>
+      <div class="progress" style="height: 5px;">
+        <div class="progress-bar bg-success" role="progressbar" id="timeProgressBar"></div>   <!-- style="transition-duration: 0.3s;"-->
+      </div>
     </div>
 
     <div class="d-flex flex-column flex-fill" id="ph-main-status">
@@ -90,7 +93,7 @@
         </div>
         <div class="d-flex flex-fill" id="ph-sounder">
             <div class="d-flex fs-2 flex-fill justify-content-around">
-                <div><i class="bi bi-volume-up-fill main-icon"></i></div> 
+                <div><i class="bi bi-volume-up-fill main-icon"></i></div>
                 <div><i class="bi bi-volume-off-fill main-icon"></i></div>
                 <div><i class="bi bi-volume-mute-fill main-icon"></i></div>
             </div>
@@ -216,7 +219,7 @@
             </div>
             <div class="d-flex flex-column flex-fill align-items-end">
               <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
-                <img src="/static/images/paypal_donate.jpg" class="rounded float-end" 
+                <img src="/static/images/paypal_donate.jpg" class="rounded float-end"
             width="100" height="100"  alt="Like the app? Then why not buy me a coffee.">
               </a>
             </div>
@@ -262,18 +265,18 @@
 {% endblock %}
 
 {% block script %}
-<script src="/static/js/heartbeat.js"></script> 
+<script src="/static/js/heartbeat.js"></script>
 
-<script src="/static/chart.js/dist/chart.umd.js"></script> 
+<script src="/static/chart.js/dist/chart.umd.js"></script>
 <script src="/static/chart.js/dist/plugins/chartjs-plugin-annotation.js"></script>
 
-<script src="/static/js/dougnut_battery_voltage.js"></script> 
-<script src="/static/js/dougnut_battery_charge.js"></script> 
-<script src="/static/js/dougnut_input_voltage.js"></script> 
-<script src="/static/js/dougnut_power.js"></script> 
-<script src="/static/js/chart_battery_charge.js"></script> 
-<script src="/static/js/chart_input_voltage.js"></script> 
-<script src="/static/js/chart_power.js"></script> 
+<script src="/static/js/dougnut_battery_voltage.js"></script>
+<script src="/static/js/dougnut_battery_charge.js"></script>
+<script src="/static/js/dougnut_input_voltage.js"></script>
+<script src="/static/js/dougnut_power.js"></script>
+<script src="/static/js/chart_battery_charge.js"></script>
+<script src="/static/js/chart_input_voltage.js"></script>
+<script src="/static/js/chart_power.js"></script>
 <script src="/static/js/chart_runtime.js"></script>
 <!-- <script src="/static/js/screen_size.js"></script> -->
 
@@ -303,9 +306,13 @@
     Mode   = params.get("mode");
     console.log("NUTCase addEventListener URL query: Addr " + Addr + " Port " + Port + " Device " + Device + " Mode " + Mode)
 
+    var elem = document.getElementById("timeProgressBar");
+    elem.style.width = "100%"
+    trigger_time_bar()
+
     if (Addr === null || Device === null) {
       console.log("Get default from API")
-  
+
       $.getJSON( "/api/default", function(data) {
           // console.log("Got default server info: " + data + " " + data.addr + " " + data.port  + " " + data.device )
           if (data.device) {
@@ -316,17 +323,17 @@
               if (data.port) {
                 Port = data.port;
               }
-            } 
+            }
         })
         .done(function() {
           console.log( "Call /api/default success. Got default server info: " + Addr + " Device " + Device );
           if (Addr && Device) {
             updateStatus("ph_debug")
-            return            
+            return
           } else {
             document.getElementById("ph-main-status").innerHTML = HTML_No_Default
             document.getElementById("icon-navbar-warning").classList.remove("d-none")
-          return            
+          return
           }
         })
         .fail(function() {
@@ -337,31 +344,54 @@
         // .always(function() {
         //   console.log( "complete" );
         // });
-      } 
+      }
       else {
         console.log( "Using URL query values " + Addr + " Port " + Port + " Device " + Device );
         updateStatus("ph_debug")
       }
   })
 
+  function trigger_time_bar() {
+    var i = 0;
+    if (i == 0) {
+      i = 1;
+      // var elems = document.getElementsByName("timeProgressBar");
+      var elem = document.getElementById("timeProgressBar");
+      var width = 100;
+      // elems.forEach(elem => elem.style.width = width + "%");
+      elem.style.width = width + "%";
+      var id = setInterval(frame, 290);
+      function frame() {
+        if (width <= 0) {
+          clearInterval(id);
+          i = 0;
+        } else {
+          width--;
+//          elems.forEach(elem => elem.style.width = width + "%");
+          elem.style.width = width + "%";
+        }
+      }
+    }
+  }
+
 //=================================================
 // Update the current data
 //=================================================
 function updateStatus(selector) {
-    API_Call = '/api/status' 
+    API_Call = '/api/status'
 
     //=================================================
     // Hide any open tool tips so they don't persist
     //=================================================
     $('[data-bs-toggle="tooltip"], .tooltip').tooltip("hide");
 
-    if (Addr && Device) { 
+    if (Addr && Device) {
       API_Call += '?addr=' + Addr + '&dev=' + Device
-      if (Port) { 
-        API_Call += '&port=' + Port 
+      if (Port) {
+        API_Call += '&port=' + Port
         }
-      if (Mode) { 
-        API_Call += '&mode=' + Mode 
+      if (Mode) {
+        API_Call += '&mode=' + Mode
       }
     } else {
       return
@@ -375,16 +405,17 @@ function updateStatus(selector) {
       if (Object.keys(data).length == 0) {
         document.getElementById("ph-main-status").innerHTML = HTML_No_Server_Comms
         heartBeat("error")
-        return           
+        return
       }
       heartBeat("beat")
+      trigger_time_bar()
     })
     .done(function(data) {
       if (Object.keys(data).length == 0) { return }
 
 // Device pull down
       document.getElementById("ph-download-menu").innerHTML = data.download_menu
-      
+
 // Status area
       document.getElementById("ph-main-status").innerHTML = data.status
       document.getElementById("ph-runtime").innerHTML = data.runtime
@@ -394,10 +425,10 @@ function updateStatus(selector) {
       if (Port) {
         document.getElementById("ph-server-port").innerHTML = Port
       } else {
-        document.getElementById("ph-server-port").innerHTML = "Default (3493)" 
+        document.getElementById("ph-server-port").innerHTML = "Default (3493)"
       }
       document.getElementById("ph-server-ver").innerHTML = data.server_version
-      
+
       document.getElementById("ph-ups-device").innerHTML = Device
       document.getElementById("ph-client-cnt").innerHTML = data.client_cnt
       document.getElementById("ph-client-list").innerHTML = data.client_list
@@ -496,12 +527,13 @@ function updateStatus(selector) {
       document.getElementById("ph-main-status").innerHTML = HTML_No_Nutcase_Comms
       heartBeat("error")
     });
-    // .always(function() {
+    //.always(function() {
     //   console.log( "complete" );
-    // });
+    //  trigger_time_bar()
+    //});
     }
 
-  setInterval('updateStatus("ph_debug")', 1000 * 20); // Units: ms
+  setInterval('updateStatus("ph_debug")', 1000 * 30); // Units: ms
 
 </script>
 
