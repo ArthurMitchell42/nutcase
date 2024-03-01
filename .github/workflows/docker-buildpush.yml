@@ -5,7 +5,7 @@ on:
 #    branches: 
 #      - main
 #      - V0.3*
-    tags: [ "*" ]
+    tags: [ "*_pr", "*_tag", "*_build" ]
 #  label:
 #    branches: [ "main" ]
 
@@ -34,5 +34,5 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build the Docker image
-      run: docker buildx build --platform linux/amd64,linux/arm64/v8 --file nutcase/docker/Dockerfile --tag kronos443/nutcase:$GITHUB_REF_NAME --push .
+      run: docker buildx build --platform linux/amd64,linux/arm64/v8 --file nutcase/docker/Dockerfile --tag ${{ env.IMAGE_NAME }}:$GITHUB_REF_NAME --push .
 #  -$(date +'%Y-%m-%d_%H-%M-%S')
