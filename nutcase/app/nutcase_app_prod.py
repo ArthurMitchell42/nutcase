@@ -1,5 +1,5 @@
-from app import create_app, cli # , db
-#from app.models import User
+from app import create_app, cli  # , db
+# from app.models import User
 from config import Config_Production
 
 app = create_app(Config_Production)

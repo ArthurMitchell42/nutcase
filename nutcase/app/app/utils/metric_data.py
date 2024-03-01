@@ -1,14 +1,14 @@
 from enum import Enum
 
-#=======================================================================
+# ======================================================================
 # Enumerated types & constants
-#=======================================================================
+# ======================================================================
 Variable_Format = Enum('Variable_Format', ['NONE', 'PERCENTAGE', 'BEEPERSTATUS', 'OLDUPSSTATUS'])
 Variable_Type = Enum('Variable_Type', ['NONE', 'INTEGER', 'FLOAT', 'STRING'])
 
-#=======================================================================
+# ======================================================================
 # Metric descriptions
-#=======================================================================
+# ======================================================================
 Metric_Data_List = [
     {
         "nut_var":  "",
@@ -60,7 +60,7 @@ Metric_Data_List = [
     {
         "nut_var":  "ups.beeper.status",
         "metric":   "nut_beeper_status",
-        "help":     "If the beeper is enabled. Unknown (0), enabled (1), disabled (2) or muted (3).",
+        "help":     "If the beeper is enabled. Unknown (0), enabled (1), disabled (2) or muted (3).",  # noqa: E501
         "unit":     "",
         "style":    "gauge",
         "type":     Variable_Type.INTEGER,
@@ -424,7 +424,7 @@ Metric_Data_List = [
     {
         "nut_var":  "ups.status",
         "metric":   "nut_status",
-        "help":     "UPS status. Unknown (0), on line (1, \"OL\"), on battery (2, \"OB\"), or low battery (3, \"LB\"). (Deprecated, use nut_ups_status instead.)",
+        "help":     "UPS status. Unknown (0), on line (1, \"OL\"), on battery (2, \"OB\"), or low battery (3, \"LB\"). (Deprecated, use nut_ups_status instead.)",  # noqa: E501
         "unit":     "",
         "style":    "gauge",
         "type":     Variable_Type.INTEGER,

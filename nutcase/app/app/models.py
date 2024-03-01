@@ -3,9 +3,9 @@
 # from time import time
 # from werkzeug.security import generate_password_hash, check_password_hash
 # import jwt
-from flask import current_app
+# from flask import current_app
 # from flask_login import UserMixin
-# from app import db 
+# from app import db
 # from app import login
 
 # class User(UserMixin, db.Model):
@@ -63,4 +63,3 @@ from flask import current_app
 # @login.user_loader
 # def load_user(id):
 #     return User.query.get(int(id))
-
