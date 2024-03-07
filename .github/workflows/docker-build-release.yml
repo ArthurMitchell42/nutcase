@@ -2,7 +2,7 @@ name: Docker build latest and push
 
 on:
   push:
-    tags: [ "*_release", "*_latest" ]
+    tags: [ "*_release", "*_latest", "*_Release", "*_Latest" ]
 #  workflow_dispatch
 
 env:
