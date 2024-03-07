@@ -22,7 +22,8 @@ class Config(object):
     # Core info
     # ==================================================================
     APP_NAME              = 'NUTCase'
-    APP_VERSION           = '0.3.2'
+    APP_VERSION           = '0.3.3'
+    GITHUB_API_URL = "https://api.github.com/repos/ArthurMitchell42/nutcase/"
 
     # ==================================================================
     # Configuration file

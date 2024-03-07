@@ -523,7 +523,7 @@ function updateStatus(selector) {
       runtime_chart_obj.update();
     })
     .fail(function() {
-      console.log( "Call /api/status failed" );
+      console.log( "Call to " + API_Call + " failed" );
       document.getElementById("ph-main-status").innerHTML = HTML_No_Nutcase_Comms
       heartBeat("error")
     });
