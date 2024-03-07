@@ -7,7 +7,7 @@
 [![Docker Stars](https://img.shields.io/docker/stars/kronos443/nutcase?label=Stars&logo=docker&style=for-the-badge)](https://hub.docker.com/r/kronos443/nutcase)
 
 [![Docker Build](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml)
-[![Docker build and push](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml)
+[![Docker build and push release tag & latest](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-build-release.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-build-release.yml)
 
 s
 > [!TIP]
