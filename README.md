@@ -10,23 +10,23 @@
 [![Docker build and push](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml)
 
 > [!TIP]
-> ### News: [V0.3.0](https://github.com/ArthurMitchell42/nutcase/discussions/30) is released today. - 3/2/2024
+> ### News: [V0.3.3](https://github.com/ArthurMitchell42/nutcase/releases) is released today. - 7/3/2024
 
-<h2 id="introduction">A Network UPS Tools (NUT) and APC daemon exporter to pass data to Prometheus and any JSON compatible applications</h2>
-<h3 id="key-features">Key features</h3>
+## A **Network UPS Tools (NUT)** and **APC daemon** exporter working with Prometheus and any JSON compatible application and GUI
 
-* A drop-in replacement for other Prometheus scrapers such as HON95/prometheus-nut-exporter.
-* A graphic interface showing key data over time with diagnostic information. <a href="https://github.com/ArthurMitchell42/nutcase/discussions/19"><img src="https://img.shields.io/badge/New_in_V0.3.0-8A2BE2"></a>
-* Supports pulling data from NUT and APC servers and formatting the UPS status for the [Prometheus](https://prometheus.io/) logging system
-* Supports formatting the UPS status as JSON for use with the beautiful [HomePage](https://gethomepage.dev/) app.
-* The JSON output can be used with [Uptime Kuma](https://github.com/louislam/uptime-kuma) and other reporting, alarming and monitoring apps.
-* Provides diagnostic information and usage information.
+### Key features
+* Acts as a **drop in replacement** for other NUT scrapers such as HON95 prometheus nut exporter
+* A [graphic interface](https://github.com/ArthurMitchell42/nutcase/wiki/The-GUI) showing key data over time with diagnostic information. <a href="https://github.com/ArthurMitchell42/nutcase/wiki/The-GUI"><img src="https://img.shields.io/badge/New_in_V0.3.0-8A2BE2"></a>
+* Supports pulling data from NUT and APC servers, formatting the UPS metrics for the [Prometheus](https://prometheus.io/) logging system
+* Supports formatting the UPS data as JSON for use with the beautiful [HomePage](https://gethomepage.dev/) app.
+* The JSON output can be used with [Uptime Kuma](https://github.com/louislam/uptime-kuma) and other reporting, alerting and monitoring apps.
+* Provides diagnostic and usage information.
 * Supports APC apcupsd servers for graphic display **and** metric scraping - **Use one Prometheus and Grafana dashboard for all servers.**
-* Supports filtering of JSON elements to support simple monitoring apps. See [Filtering the JSON](https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase#filtering-the-json-) <a href="https://github.com/ArthurMitchell42/nutcase/discussions/19"><img src="https://img.shields.io/badge/New_in_V0.3.0-8A2BE2"></a>
+* Supports filtering of JSON elements to support simple monitoring apps. See [Filtering the JSON](https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase#filtering-the-json-) <a href="https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase#filtering-the-json-"><img src="https://img.shields.io/badge/New_in_V0.3.0-8A2BE2"></a>
 
 ![image](https://github.com/ArthurMitchell42/nutcase/assets/82239494/6fbfa4d8-7cbc-4882-9e8e-ac3907e70d9a)
 
-### How It Works
+### What it does for you
 
 ![Structure](https://github.com/ArthurMitchell42/nutcase/blob/6e7b52aa5cd89663476fa5558ab05a15233967aa/resources/structure_v2.png)
 
@@ -149,79 +149,28 @@ Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker un
 
 [Contents](#contents)
 
-<h3 id="preparation">Preparation and Application Setup</h3>
-<p>
-<h4 id="preparation-system">Your UPS system</h3>
-Your UPS system should be set up and working.
-<ol>
-  <li>Your UPS should be connected to the machine you intend to have as the NUT server.</li>
-  <li>The NUT server software should be installed and the UPS should be configured correctly.</li>
-</ol>
-<p>You can verify if this is correctly setup by using:</p>
+Getting started
+  * [Instalation](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container)
+  * [Accessing Nutcase](https://github.com/ArthurMitchell42/nutcase/wiki/Accessing-and-Using-NUTCase)
+  * [Configuring NUTCase](https://github.com/ArthurMitchell42/nutcase/wiki/The-Configuration-File)
 
-<code>    telnet server-ip server-port</code><br>
+Using NUTCase
+  * [Working with the GUI](https://github.com/ArthurMitchell42/nutcase/wiki/The-GUI)
+  * [Working with HomePage](https://github.com/ArthurMitchell42/nutcase/wiki/Customising-the-data-displayed-on-the-HomePage-app)
+  * [Working with other JSON consumers](https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase)
+  * [Interfacing to Prometheus & Grafana](https://github.com/ArthurMitchell42/nutcase/wiki/Using-with-Prometheus-and-Grafana)
 
-and typing <code>VER</code> at the command line followed by <code>LIST UPS</code>. If the server is correctly configured you should get the version information of the server followed by a list of UPS's served by the machine. The result should that look something like this:<br>
-```
-  VER
-    DSM7-1-1-42930-workplus-version2-repack-42930-220712
-  LIST UPS
-    BEGIN LIST UPS
-    UPS ups "Description unavailable"
-    END LIST UPS
-```
-This example output is from a Synology DSM 7.1 NAS. The name `ups` is not configurable and neither is the decsription [^1]
-
-See [Diagnosing Connection Issues](https://github.com/ArthurMitchell42/nutcase/wiki/Diagnosing-Connection-Issues) to set up an diagnose connection issues.
-
-> [^1]: <i>without SSH'ing into the system and editing config files.</i>
-
-> [!IMPORTANT]
-> Your NUT server must be functioning before trying to run NUTCase or you will only recieve errors.
-
-<h4 id="preparation-docker">The NUTCase docker container</h3>
-To setup the NUTCase docker container:
-<ol start="3">
-  <li>Create the logging directory on the mapped docker share directory.</li>
-  <li>Add the container to your system and start.</li>
-</ol>
-</p>
-
-[Contents](#contents)
-
-<h3 id="nutcase-useage">NUTCase Usage</h3>
-
-For details on useage please see [Running the NUTCase container](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container).
-
-[Contents](#contents)
-
-<h3 id="parameters">Parameters</h3>
-<p>
-The parameters available are documented in [Running the NUTCase container](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container)
-
-[Contents](#contents)
-
-<h3 id="endpoints">End-points to Access NUTCase</h3>
-
-Please see [Accessing and Using NUTCase](https://github.com/ArthurMitchell42/nutcase/wiki/Accessing-and-Using-NUTCase)
-
-[Contents](#contents)
-
-<h3 id="using-nutcase">Using NUTCase</h3>
-<h4 id="using-nutcase-prometheus">Prometeus & Grafana</h4>
-
-See [Using with Prometheus and Grafana](https://github.com/ArthurMitchell42/nutcase/wiki/Using-with-Prometheus-and-Grafana)
-
-<h4 id="using-nutcase-homepage">HomePage</h4>
-
-To configure HomePage to display information from NUTCase see [Customising the Data Displayed on the HomePage App](https://github.com/ArthurMitchell42/nutcase/wiki/Customising-the-Data-Displayed-on-the-HomePage-App)
-
+Advanced useage
+  * [Customising data for HomePage and UptimeKuma](https://github.com/ArthurMitchell42/nutcase/wiki/Customising-the-Data-Displayed-on-the-HomePage-App)
+  * [With APC devices](https://github.com/ArthurMitchell42/nutcase/wiki/NUTCase-and-APC's-apcupsd)
+  * [Custom variables](https://github.com/ArthurMitchell42/nutcase/wiki/Reworking-variables-using-the-configuration-file)
+  * [WebHooks](https://github.com/ArthurMitchell42/nutcase/wiki/WebHooks)
 
 [Contents](#contents)
 
 <h3 id="credits">Credits</h3>
 <p>
-Credit goes to the HON95 container upon which this is heavily based on.
+Credit goes to the HON95 container which gave inspiration to the metrics function.
 </p>
 
 [Contents](#contents)
