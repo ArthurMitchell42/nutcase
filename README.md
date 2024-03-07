@@ -9,6 +9,7 @@
 [![Docker Build](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml)
 [![Docker build and push](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-buildpush.yml)
 
+s
 > [!TIP]
 > ### News: [V0.3.3](https://github.com/ArthurMitchell42/nutcase/releases) is released today. - 7/3/2024
 
