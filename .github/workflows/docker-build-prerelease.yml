@@ -5,7 +5,7 @@ on:
 #    branches:
 #      - main
 #      - V0.3*
-    tags: [ "*_pr", "*_prerelease", "*_pre-release" ]
+    tags: [ "*_pr", "*_prerelease", "*_pre-release", "*_PR", "*_PreRelease", "*_Pre-Release" ]
 #  label:
 #    branches: [ "main" ]
 
