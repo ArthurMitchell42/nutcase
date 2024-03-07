@@ -2,10 +2,10 @@ name: Docker build and push tag
 
 on:
   push:
-#    branches: 
+#    branches:
 #      - main
 #      - V0.3*
-    tags: [ "*_pr", "*_tag", "*_build" ]
+    tags: [ "*_pr", "*_prerelease", "*_pre-release" ]
 #  label:
 #    branches: [ "main" ]
 
@@ -14,7 +14,7 @@ env:
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: kronos443/nutcase
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest

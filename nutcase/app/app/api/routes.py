@@ -4,6 +4,7 @@ from app.api import bp
 
 from app.utils import scrape
 from app.utils import gui_data_format
+from app.api import api_utils
 
 # ====================================================================================
 # Serve the end-point /api/status
@@ -56,5 +57,46 @@ def route_default():
         Result['device'] = s['device']
         if 'default' in s:
             break
+
+    return Result
+
+# ====================================================================================
+# Serve the end-point /api/events - Returns JSON for the event icons
+#   on the tool bar.
+# ====================================================================================
+@bp.route('/events')
+def route_events():
+    Result = {}
+    Overflow = "99+"
+    if current_app.config['APP_STATUS_FLAGS']['info'] > 100:
+        Result['info_flag_val'] = Overflow
+    elif current_app.config['APP_STATUS_FLAGS']['info'] > 0:
+        Result['info_flag_val'] = str(current_app.config['APP_STATUS_FLAGS']['info'])
+    else:
+        Result['info_flag_val'] = ""
+    if current_app.config['APP_STATUS_FLAGS']['warning'] > 100:
+        Result['warn_flag_val'] = Overflow
+    elif current_app.config['APP_STATUS_FLAGS']['warning'] > 0:
+        Result['warn_flag_val'] = str(current_app.config['APP_STATUS_FLAGS']['warning'])
+    else:
+        Result['warn_flag_val'] = ""
+    if current_app.config['APP_STATUS_FLAGS']['alert'] > 100:
+        Result['alert_flag_val'] = Overflow
+    elif current_app.config['APP_STATUS_FLAGS']['alert'] > 0:
+        Result['alert_flag_val'] = str(current_app.config['APP_STATUS_FLAGS']['alert'])
+    else:
+        Result['alert_flag_val'] = ""
+
+    return Result
+
+# ====================================================================================
+# Serve the end-point /api/events - Returns JSON for the event icons
+#   on the tool bar.
+# ====================================================================================
+@bp.route('/appupdate')
+def route_appupdate():
+    Result = {}
+
+    Result['app_update'] = api_utils.Get_Update_String()
 
     return Result

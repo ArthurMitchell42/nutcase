@@ -4,7 +4,7 @@ import unittest.mock as mock
 from unittest.mock import call
 
 from http import HTTPStatus
-from urllib.error import URLError, HTTPError  # For webhooks
+from urllib.error import URLError, HTTPError
 
 from .mock_types import Urlopen
 
@@ -28,6 +28,7 @@ class BaseTestCase(unittest.TestCase):
 
 @mock.patch("urllib.request.urlopen", autospec=True)
 class Test_webhook_call_url(BaseTestCase):
+    # HTTPError
     def test_webhook_http_error(self, mock_urlopen):
         url = "http://10.0.10.180:3001/api/push/fFWFJscQXd?status=up&msg=OK&ping="
         rtn_obj = Urlopen(url)
@@ -44,9 +45,8 @@ class Test_webhook_call_url(BaseTestCase):
                 ])
 
         self.assertFalse(Rtn)
-        self.assertLogs("", level='DEBUG')
 
-# URLError
+    # URLError
     def test_webhook_url_error(self, mock_urlopen):
         url = "http://10.0.10.180:3001/api/push/fFWFJscQXd?status=up&msg=OK&ping="
         rtn_obj = Urlopen(url)
@@ -60,9 +60,8 @@ class Test_webhook_call_url(BaseTestCase):
                 ])
 
         self.assertFalse(Rtn)
-        # self.assertLogs("", level='CRITICAL')
 
-# Normal
+    # Normal
     def test_webhook_normal(self, mock_urlopen):
         url = "http://10.0.10.180:3001/api/push/fFWFJscQXd?status=up&msg=OK&ping="
         rtn_obj = Urlopen(url)
@@ -72,7 +71,7 @@ class Test_webhook_call_url(BaseTestCase):
         self.assertEqual(mock_urlopen.call_count, 1)
         self.assertEqual(rtn_obj.geturl(), url)
 
-# Return 404
+    # Return 404
     def test_webhook_return_404(self, mock_urlopen):
         url = "http://10.0.10.180:3001/api/push/fFWFJscQXd?status=up&msg=OK&ping="
         rtn_obj = Urlopen(url, code=HTTPStatus.NOT_FOUND, read_data='')
@@ -88,9 +87,8 @@ class Test_webhook_call_url(BaseTestCase):
 
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 1)
-        # self.assertLogs("", level='WARNING')
 
-# Return json not ok no msg
+    # Return json not ok no msg
     def test_webhook_return_json_not_ok_no_msg(self, mock_urlopen):
         url = "http://10.0.10.180:3001/api/push/fFWFJscQXd?status=up&msg=OK&ping="
         rtn_obj = Urlopen(url, read_data='{"ok":false}')
@@ -98,7 +96,6 @@ class Test_webhook_call_url(BaseTestCase):
 
         with self.assertLogs('tests', level='DEBUG') as cm:
             Rtn = Call_URL(self.app, url)
-            # print("=======> cm.output {}".format(cm.output))
             self.assertEqual(cm.output, [
                 "WARNING:tests.unit.test_webhook:The webhook returned an 'ok' "
                 "element as not True with the message 'none'"
@@ -106,9 +103,8 @@ class Test_webhook_call_url(BaseTestCase):
 
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 1)
-        # self.assertLogs("", level='WARNING')
 
-# Return json not ok with msg
+    # Return json not ok with msg
     def test_webhook_return_json_not_ok_with_msg(self, mock_urlopen):
         url = "http://10.0.10.180:3001/api/push/fFWFJscQXd?status=up&msg=OK&ping="
         rtn_obj = Urlopen(url, read_data='{"ok":false,"msg":"A Message"}')
@@ -116,7 +112,6 @@ class Test_webhook_call_url(BaseTestCase):
 
         with self.assertLogs('tests', level='DEBUG') as cm:
             Rtn = Call_URL(self.app, url)
-            # print("=======> cm.output {}".format(cm.output))
             self.assertEqual(cm.output, [
                 "WARNING:tests.unit.test_webhook:The webhook returned an 'ok' "
                 "element as not True with the message 'A Message'"
@@ -124,7 +119,6 @@ class Test_webhook_call_url(BaseTestCase):
 
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 1)
-        # self.assertLogs("", level='WARNING')
 
 @mock.patch("urllib.request.urlopen", autospec=True)
 class Test_webhook_call_webhook(BaseTestCase):
@@ -170,7 +164,6 @@ class Test_webhook_call_webhook(BaseTestCase):
         Rtn = Call_Webhook(self.app, "", {})
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 1)
-        # print("args: {}".format(mock_urlopen.call_args))
         mock_urlopen.assert_called_once_with(url)
 
     def test_webhook_named(self, mock_urlopen):
@@ -187,7 +180,6 @@ class Test_webhook_call_webhook(BaseTestCase):
         Rtn = Call_Webhook(self.app, "named", {})
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 1)
-        # print("args: {}".format(mock_urlopen.call_args))
         mock_urlopen.assert_called_once_with(url + "named")
 
     def test_webhook_default_multiple(self, mock_urlopen):
@@ -204,10 +196,7 @@ class Test_webhook_call_webhook(BaseTestCase):
         Rtn = Call_Webhook(self.app, "", {})
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 2)
-        # print("args: {}".format(mock_urlopen.call_args))
-        # print("call_args_list(): {}".format(mock_urlopen.call_args_list))
 
-        # mock_urlopen.assert_called_with(url + "default1")
         calls = [call(url + "default1"), call(url + "default2")]
         mock_urlopen.assert_has_calls(calls, any_order=True)
 
@@ -225,10 +214,7 @@ class Test_webhook_call_webhook(BaseTestCase):
         Rtn = Call_Webhook(self.app, "named", {})
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 2)
-        # print("args: {}".format(mock_urlopen.call_args))
-        # print("call_args_list(): {}".format(mock_urlopen.call_args_list))
 
-        # mock_urlopen.assert_called_with(url + "default1")
         calls = [call(url + "named1"), call(url + "named2")]
         mock_urlopen.assert_has_calls(calls, any_order=True)
 
