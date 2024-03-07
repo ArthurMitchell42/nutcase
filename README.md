@@ -15,13 +15,14 @@
 <h2 id="introduction">A Network UPS Tools (NUT) and APC daemon exporter to pass data to Prometheus and any JSON compatible applications</h2>
 <h3 id="key-features">Key features</h3>
 
-* A graphic interface showing key data over time with diagnostic information. <a href="https://github.com/ArthurMitchell42/nutcase/discussions/19"><img src="https://img.shields.io/badge/New_in_V0.3.0_Beta_1-8A2BE2"></a>
+* A drop-in replacement for other Prometheus scrapers such as HON95/prometheus-nut-exporter.
+* A graphic interface showing key data over time with diagnostic information. <a href="https://github.com/ArthurMitchell42/nutcase/discussions/19"><img src="https://img.shields.io/badge/New_in_V0.3.0-8A2BE2"></a>
 * Supports pulling data from NUT and APC servers and formatting the UPS status for the [Prometheus](https://prometheus.io/) logging system
 * Supports formatting the UPS status as JSON for use with the beautiful [HomePage](https://gethomepage.dev/) app.
 * The JSON output can be used with [Uptime Kuma](https://github.com/louislam/uptime-kuma) and other reporting, alarming and monitoring apps.
 * Provides diagnostic information and usage information.
 * Supports APC apcupsd servers for graphic display **and** metric scraping - **Use one Prometheus and Grafana dashboard for all servers.**
-* Supports filtering of JSON elements to support simple monitoring apps. See [Filtering the JSON](https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase#filtering-the-json-) <a href="https://github.com/ArthurMitchell42/nutcase/discussions/19"><img src="https://img.shields.io/badge/New_in_V0.3.0_Beta_4-8A2BE2"></a>
+* Supports filtering of JSON elements to support simple monitoring apps. See [Filtering the JSON](https://github.com/ArthurMitchell42/nutcase/wiki/Using-the-JSON-returned-by-NUTCase#filtering-the-json-) <a href="https://github.com/ArthurMitchell42/nutcase/discussions/19"><img src="https://img.shields.io/badge/New_in_V0.3.0-8A2BE2"></a>
 
 ![image](https://github.com/ArthurMitchell42/nutcase/assets/82239494/6fbfa4d8-7cbc-4882-9e8e-ac3907e70d9a)
 
@@ -33,7 +34,7 @@ NUTCase sits between any nuber of UPS servers, either NUT or APC, and converts t
 The JSON is ideal for monitoring or display on dashboard systems such as HomePage.
 
 <h3 id="contents">Contents</h3>
-  
+
 - [Introduction](#introduction)
   - [Key features](#key-features)
   - [Contents](#contents)
@@ -73,7 +74,7 @@ The Wiki for usage information and advice:
 
 <h3 id="architectures">Supported Architectures</h3>
 <p>
-Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker under Raspberry PI with a 64-bit OS such as Raspberry PI OS 64-bit and Ubuntu 64-bit)'     
+Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker under Raspberry PI with a 64-bit OS such as Raspberry PI OS 64-bit and Ubuntu 64-bit)'
 <br>
 
 <table>
@@ -104,6 +105,16 @@ Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker un
 </tr>
 </thead>
 <tbody>
+<tr>
+<td align="left">7/3/2024</td>
+<td align="left">0.3.3</td>
+<td align="left">Add a check for release updates on the GUI, prep-work for next major release.</td>
+</tr>
+<tr>
+<td align="left">22/2/2024</td>
+<td align="left">0.3.2</td>
+<td align="left">Correct re-work of cl-count miss reading data</td>
+</tr>
 <tr>
 <td align="left">19/2/2024</td>
 <td align="left">0.3.1</td>
@@ -180,7 +191,7 @@ To setup the NUTCase docker container:
 
 <h3 id="nutcase-useage">NUTCase Usage</h3>
 
-For details on useage please see [Running the NUTCase container](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container). 
+For details on useage please see [Running the NUTCase container](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container).
 
 [Contents](#contents)
 
