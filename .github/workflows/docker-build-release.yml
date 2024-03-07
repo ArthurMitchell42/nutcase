@@ -1,4 +1,4 @@
-name: Docker build latest and push
+name: Docker build and push release tag & latest
 
 on:
   push:
