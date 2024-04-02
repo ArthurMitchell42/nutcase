@@ -11,7 +11,7 @@
 
 s
 > [!TIP]
-> ### News: [V0.4.0 beta is starting testing](#46) is released today. - 7/3/2024
+> ### News: [V0.4.0 beta is starting testing](#46) 2/3/2024
 
 ## A **Network UPS Tools (NUT)** and **APC daemon** exporter working with Prometheus and any JSON compatible application and GUI
 
