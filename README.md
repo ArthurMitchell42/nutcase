@@ -9,7 +9,6 @@
 [![Docker Build](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-image.yml)
 [![Docker build and push release tag & latest](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-build-release.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-build-release.yml)
 
-s
 > [!TIP]
 > ### News: [V0.4.0 beta is starting testing](#46) 2/4/2024
 
