@@ -149,7 +149,7 @@ def Dougnut_Input_Voltage(UPS, Result):
     elif Output_Nominal := format_to_text.Get_NUT_Variable(UPS, 'output.voltage.nominal'):
         Line_Nominal = float(Output_Nominal)
 
-    Max_Input_Volts = 1
+    Max_Input_Volts = Input_Volts * 1.3
     if Input_TH:
         Input_TH = float(Input_TH)
         Max_Input_Volts = Input_TH * 1.1
@@ -157,7 +157,8 @@ def Dougnut_Input_Voltage(UPS, Result):
         Max_Input_Volts = float(Line_Nominal) * 1.22
 
     if Max_Input_Volts == 0:
-        Max_Input_Volts = 1
+        Max_Input_Volts = Input_Volts * 1.3
+
     if Input_Volts > Max_Input_Volts:
         Input_Volts = Max_Input_Volts
     Result['input_volts'] = [Input_Volts, Max_Input_Volts - Input_Volts]
