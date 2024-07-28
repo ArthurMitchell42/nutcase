@@ -10,7 +10,7 @@
 [![Docker build and push release tag & latest](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-build-release.yml/badge.svg)](https://github.com/ArthurMitchell42/nutcase/actions/workflows/docker-build-release.yml)
 
 > [!TIP]
-> ### News: [V0.4.0.0 is released] 28/7/2024
+> ### News: [V0.4.0.0 is released](#59) 28/7/2024
 
 ## A **Network UPS Tools (NUT)** and **APC daemon** exporter working with Prometheus and any JSON compatible application and GUI
 
