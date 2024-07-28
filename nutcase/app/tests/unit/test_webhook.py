@@ -2,6 +2,7 @@ import unittest
 import flask
 import unittest.mock as mock
 from unittest.mock import call
+import logging
 
 from http import HTTPStatus
 from urllib.error import URLError, HTTPError
@@ -36,11 +37,14 @@ class Test_webhook_call_url(BaseTestCase):
         mock_urlopen.side_effect = HTTPError(url=url, code=HTTPStatus.BAD_REQUEST,
                                              msg="Bad request", hdrs=None, fp=None)
 
-        with self.assertLogs('tests', level='DEBUG') as cm:
+        with self.assertLogs(logging.getLogger(__name__), level='DEBUG') as cm:
+            formatter = logging.Formatter('%(levelname)s:%(message)s')
+            logging.getLogger(__name__).handlers[0].setFormatter(formatter)
+
             Rtn = Call_URL(self.app, url)
             self.assertEqual(cm.output, [
-                "WARNING:tests.unit.test_webhook:Failed to call webhook. Reason: Bad request",
-                "WARNING:tests.unit.test_webhook:Webhook server couldn't "
+                "WARNING:Failed to call webhook. Reason: Bad request",
+                "WARNING:Webhook server couldn't "
                 "fulfill request Error: 400",
                 ])
 
@@ -53,10 +57,13 @@ class Test_webhook_call_url(BaseTestCase):
         mock_urlopen.return_value = rtn_obj
         mock_urlopen.side_effect = URLError(reason="The reason")
 
-        with self.assertLogs('tests', level='DEBUG') as cm:
+        with self.assertLogs(logging.getLogger(__name__), level='DEBUG') as cm:
+            formatter = logging.Formatter('%(levelname)s:%(message)s')
+            logging.getLogger(__name__).handlers[0].setFormatter(formatter)
+
             Rtn = Call_URL(self.app, url)
             self.assertEqual(cm.output, [
-                "WARNING:tests.unit.test_webhook:Failed to call webhook. Reason: The reason"
+                "WARNING:Failed to call webhook. Reason: The reason"
                 ])
 
         self.assertFalse(Rtn)
@@ -77,11 +84,14 @@ class Test_webhook_call_url(BaseTestCase):
         rtn_obj = Urlopen(url, code=HTTPStatus.NOT_FOUND, read_data='')
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertLogs('tests', level='DEBUG') as cm:
+        with self.assertLogs(logging.getLogger(__name__), level='DEBUG') as cm:
+            formatter = logging.Formatter('%(levelname)s:%(message)s')
+            logging.getLogger(__name__).handlers[0].setFormatter(formatter)
+
             Rtn = Call_URL(self.app, url)
             self.assertEqual(cm.output, [
-                "WARNING:tests.unit.test_webhook:WebHook returned 404: NOT_FOUND",
-                "WARNING:tests.unit.test_webhook:JSON Returned by a web hook could "
+                "WARNING:WebHook returned 404: NOT_FOUND",
+                "WARNING:JSON Returned by a web hook could "
                 "not be parsed Expecting value: line 1 column 1 (char 0)"
                 ])
 
@@ -94,11 +104,13 @@ class Test_webhook_call_url(BaseTestCase):
         rtn_obj = Urlopen(url, read_data='{"ok":false}')
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertLogs('tests', level='DEBUG') as cm:
+        with self.assertLogs(logging.getLogger(__name__), level='DEBUG') as cm:
+            formatter = logging.Formatter('%(levelname)s:%(message)s')
+            logging.getLogger(__name__).handlers[0].setFormatter(formatter)
+
             Rtn = Call_URL(self.app, url)
             self.assertEqual(cm.output, [
-                "WARNING:tests.unit.test_webhook:The webhook returned an 'ok' "
-                "element as not True with the message 'none'"
+                "WARNING:The webhook returned an 'ok' element as not True with the message 'none'"
                 ])
 
         self.assertTrue(Rtn)
@@ -110,10 +122,13 @@ class Test_webhook_call_url(BaseTestCase):
         rtn_obj = Urlopen(url, read_data='{"ok":false,"msg":"A Message"}')
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertLogs('tests', level='DEBUG') as cm:
+        with self.assertLogs(logging.getLogger(__name__), level='DEBUG') as cm:
+            formatter = logging.Formatter('%(levelname)s:%(message)s')
+            logging.getLogger(__name__).handlers[0].setFormatter(formatter)
+
             Rtn = Call_URL(self.app, url)
             self.assertEqual(cm.output, [
-                "WARNING:tests.unit.test_webhook:The webhook returned an 'ok' "
+                "WARNING:The webhook returned an 'ok' "
                 "element as not True with the message 'A Message'"
                 ])
 
@@ -196,7 +211,6 @@ class Test_webhook_call_webhook(BaseTestCase):
         Rtn = Call_Webhook(self.app, "", {})
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 2)
-
         calls = [call(url + "default1"), call(url + "default2")]
         mock_urlopen.assert_has_calls(calls, any_order=True)
 
@@ -214,7 +228,6 @@ class Test_webhook_call_webhook(BaseTestCase):
         Rtn = Call_Webhook(self.app, "named", {})
         self.assertTrue(Rtn)
         self.assertEqual(mock_urlopen.call_count, 2)
-
         calls = [call(url + "named1"), call(url + "named2")]
         mock_urlopen.assert_has_calls(calls, any_order=True)
 

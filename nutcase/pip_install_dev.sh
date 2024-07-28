@@ -7,4 +7,5 @@ pip install -U flask_wtf
 pip install -U arrow
 pip install -U flake8
 pip install -U coverage
-
+pip install flask-sqlalchemy
+pip install flask-migrate

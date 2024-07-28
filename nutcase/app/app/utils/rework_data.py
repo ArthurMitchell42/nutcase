@@ -68,15 +68,15 @@ def Transform_Ratio(Var, Rework, UPS):
     else:
         Nominal_Power = 0
 
-    if Server := configuration.Get_Server(current_app, UPS['server_address']):
-        if 'power' in Server:
+    if Device := configuration.Get_Device(UPS['server_address'], UPS['name']):
+        if 'power' in Device:
             try:
-                Nominal_Power = float(Server['power'])
+                Nominal_Power = float(Device['power'])
                 current_app.logger.debug("Using power value from config {}".format(Nominal_Power))
             except Exception:
                 Nominal_Power = 0.0
                 current_app.logger.error(
-                    "Can't use power value from server config {}".format(Server['power']))
+                    "Can't use power value from server config {}".format(Device['power']))
 
     Percent_Power = float(Var["value"])
 
@@ -121,7 +121,7 @@ def Transform_Variable(Var, Rework, UPS):
     return
 
 # ===================================================================================================
-#
+# Transform_Client_Count
 # ===================================================================================================
 def Transform_Client_Count(UPS, Rework):
     current_app.logger.debug("Applying transform {} and appending to UPS {}".format(
@@ -129,7 +129,31 @@ def Transform_Client_Count(UPS, Rework):
 
     New_Var = {"name": Rework["to"], "value": ""}
 
-    Expected = int(Rework["control"][0])
+    Expected = 0
+    Parse_Error = False
+    Exp_Entry = Rework["control"][0]
+    if isinstance(Exp_Entry, str):
+        if Exp_Entry.lower() == 'auto':
+            Device_Clients = None
+            Device = configuration.Get_Device(UPS['server_address'], UPS['name'])
+            if 'clients' in Device:
+                Device_Clients = Device['clients']
+
+            Expected = len(Device_Clients)
+        else:
+            try:
+                Expected = int(Exp_Entry)
+            except Exception as Error:
+                current_app.logger.error(f"Could not use rework control {Rework}, {Error}")
+                current_app.config.update(CONFIG_ERROR=True)
+                Parse_Error = True
+    elif isinstance(Exp_Entry, int):
+        Expected = int(Exp_Entry)
+    else:
+        current_app.logger.error(f"Could not use count in rework control {Rework}")
+        current_app.config.update(CONFIG_ERROR=True)
+        Parse_Error = True
+
     diff = len(UPS["clients"]) - Expected
 
     if diff == 0:
@@ -139,11 +163,14 @@ def Transform_Client_Count(UPS, Rework):
     elif diff < 0:
         Display = Rework["control"][1].format(d=abs(diff), c=Expected)
 
-    New_Var["value"] = Display
+    if Parse_Error:
+        New_Var["value"] = "Error"
+    else:
+        New_Var["value"] = Display
     return New_Var
 
 # ===================================================================================================
-#
+# Transform_Client_Check
 # ===================================================================================================
 def Transform_Client_Check(UPS, Rework):
     current_app.logger.debug("Applying transform {} and appending to UPS {}".format(
@@ -152,20 +179,46 @@ def Transform_Client_Check(UPS, Rework):
     New_Var = {"name": Rework["to"], "value": ""}
 
     Missing = []
-    for a in Rework["control"]:
+
+    Expected_Clients = []
+    Parse_Error = False
+    Client_Control = Rework["control"]
+    if isinstance(Client_Control, str):
+        if Client_Control.lower() == 'auto':
+            Device = configuration.Get_Device(UPS['server_address'], UPS['name'])
+            if 'clients' in Device:
+                Expected_Clients = Device['clients']
+        else:
+            current_app.logger.error(f"Could not use clients in rework control {Rework}")
+            current_app.config.update(CONFIG_ERROR=True)
+            Parse_Error = True
+    elif isinstance(Client_Control, list):
+        Expected_Clients = Client_Control
+    else:
+        current_app.logger.error(f"Could not use clients in rework control {Rework}")
+        current_app.config.update(CONFIG_ERROR=True)
+        Parse_Error = True
+
+    for a in Expected_Clients:
         if a not in UPS['clients']:
             Missing.append(a)
 
     if len(Missing) > 0:
-        Display = "Missing {} ({})".format(len(Missing), Missing[0])
+        Missing_String = ""
+        for m in Missing:
+            Missing_String += m + " "
+        Display = "Missing {} {}".format(len(Missing), Missing_String)
     else:
         Display = "All present"
 
-    New_Var["value"] = Display
+    if Parse_Error:
+        New_Var["value"] = "Error"
+    else:
+        New_Var["value"] = Display
     return New_Var
 
 # ===================================================================================================
-#
+# Transform_Clients
 # ===================================================================================================
 def Transform_Clients(Rework, UPS):
     current_app.logger.debug("Transforming: clients of {} with transform {}".format(
@@ -182,6 +235,33 @@ def Transform_Clients(Rework, UPS):
     return
 
 # ===================================================================================================
+# Generate_Log_Entries
+# ===================================================================================================
+def Generate_Log_Entries(Vals):
+    # current_app.logger.debug("Generate_Log_Entries: Log_Entries {}".format(Log_Entries))
+    Entries = {}
+    for lf in current_app.config["REWORK"]:
+        if "style" in lf:
+            if lf["style"] == "nutcase_logs":
+                Var = lf['control'].format(
+                    info_total=Vals['info'],
+                    warning_total=Vals['warning'],
+                    alert_total=Vals['alert'],
+
+                    info_unread=Vals['info_unread'],
+                    warning_unread=Vals['warning_unread'],
+                    alert_unread=Vals['alert_unread'],
+
+                    info_read=Vals['info'] - Vals['info_unread'],
+                    warning_read=Vals['warning'] - Vals['warning_unread'],
+                    alert_read=Vals['alert'] - Vals['alert_unread'],
+                    )
+                Entries[lf["to"]] = Var
+
+    return Entries
+
+# ===================================================================================================
+# region Main
 # Parse data and add transformed variables
 # ===================================================================================================
 def Rework_Variables(Scrape_Data):
@@ -200,14 +280,16 @@ def Rework_Variables(Scrape_Data):
             if var["name"] in current_app.config["REWORK_VAR_LIST"]:
                 # Loop through the transforms in the control file
                 for Rework in current_app.config["REWORK"]:
-                    if Rework["from"] == var["name"]:
-                        Transform_Variable(var, Rework, ups)
-                        Status = True
+                    if "from" in Rework:
+                        if Rework["from"] == var["name"]:
+                            Transform_Variable(var, Rework, ups)
+                            Status = True
 
         if ups["name"] in current_app.config["REWORK_VAR_LIST"]:
             # Loop through the transforms in the control file
             for Rework in current_app.config["REWORK"]:
-                if Rework["from"] == ups["name"]:
-                    Transform_Clients(Rework, ups)
-                    Status = True
+                if "from" in Rework:
+                    if Rework["from"] == ups["name"]:
+                        Transform_Clients(Rework, ups)
+                        Status = True
     return Status

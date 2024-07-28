@@ -9,7 +9,7 @@ const Theme_Green_pointBorderColor          = 'rgba(0, 100, 0, 0.0)'
 const Theme_Green_pointBackgroundColor      = 'rgba(0, 200, 0, 0.5)'
 const Theme_Green_pointHoverBackgroundColor = 'rgba(200, 10, 10, 0.9)'
 const Theme_Green_Chart_fill_above          = 'rgba(0, 200, 0, 0.1)'
-const Theme_Green_Chart_pointRadius         = 3
+const Theme_Green_Chart_pointRadius         = 2
 
 const Theme_Gold_Title_Colour              = 'rgb(230, 155, 6)' //255,193,7 //getComputedStyle(document.documentElement).getPropertyValue('--bs-warning')
 const Theme_Gold_Subtitle_Colour           = getComputedStyle(document.documentElement).getPropertyValue('--bs-warning')
@@ -19,7 +19,7 @@ const Theme_Gold_pointBorderColor          = 'rgba(100, 100, 0, 0.0)'
 const Theme_Gold_pointBackgroundColor      = 'rgba(200, 200, 0, 0.5)'
 const Theme_Gold_pointHoverBackgroundColor = 'rgba(200, 10, 10, 0.9)'
 const Theme_Gold_Chart_fill_above          = 'rgba(200, 200, 0, 0.1)'
-const Theme_Gold_Chart_pointRadius         = 3
+const Theme_Gold_Chart_pointRadius         = 2
 
 const Theme_Blue_Title_Colour              = 'rgba( 13, 110, 253, 1.0)' //13,110,253   // 'rgb(' + getComputedStyle(document.documentElement).getPropertyValue('--bs-primary-rgb') + ')'
 const Theme_Blue_Subtitle_Colour           = 'rgba( 13, 100, 230, 1.0)' // getComputedStyle(document.documentElement).getPropertyValue('--bs-primary')
@@ -29,7 +29,7 @@ const Theme_Blue_pointBorderColor          = 'rgba(0, 0, 200, 0.0)'
 const Theme_Blue_pointBackgroundColor      = 'rgba(13, 110, 253, 0.5)'
 const Theme_Blue_pointHoverBackgroundColor = 'rgba(200, 10, 10, 0.9)'
 const Theme_Blue_Chart_fill_above          = 'rgba(13, 110, 253, 0.1)'
-const Theme_Blue_Chart_pointRadius         = 3
+const Theme_Blue_Chart_pointRadius         = 2
 
 const Theme_Red_Title_Colour              = 'rgba(180, 42, 56, 1.0)' // getComputedStyle(document.documentElement).getPropertyValue('--bs-danger')
 const Theme_Red_Subtitle_Colour           = 'rgba(220, 53, 69, 1.0)' // getComputedStyle(document.documentElement).getPropertyValue('--bs-danger')
@@ -39,7 +39,7 @@ const Theme_Red_pointBorderColor          = 'rgba(200,   0, 0, 0.0)'
 const Theme_Red_pointBackgroundColor      = 'rgba(200,   0, 0, 0.5)'
 const Theme_Red_pointHoverBackgroundColor = 'rgba( 10, 200, 10, 0.9)'
 const Theme_Red_Chart_fill_above          = 'rgba(200,   0, 0, 0.1)'
-const Theme_Red_Chart_pointRadius         = 3
+const Theme_Red_Chart_pointRadius         = 2
 
 //=====================
 // Chart configuration
@@ -52,7 +52,7 @@ const Chart_Subtitle_Position = 'bottom'  // top left bottom right chartArea
 const Chart_Fill              = true
 const Chart_Tension           = 0.2
 const Chart_borderWidth       = 3
-const Chart_pointBorderWidth  = 5
+const Chart_pointBorderWidth  = 3
 const Chart_pointHitRadius    = 10
 const Chart_spanGaps          = true
 const Chart_Grid_Colour       = 'rgba( 100, 100, 100, 0.3)'

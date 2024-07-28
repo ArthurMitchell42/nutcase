@@ -2,16 +2,15 @@ import json
 import urllib
 from urllib.error import URLError, HTTPError
 from http import HTTPStatus
-
 from flask import current_app
 
-HTML_Update = '''<a href="{url}" target="_blank" class="text-decoration-none text-small badge rounded-pill {style}">{text}</a>'''
+HTML_Update = '''<a href="{url}" target="_blank" class="text-decoration-none text-small badge rounded-pill {style}">{text}</a>'''  # noqa: E501
 HTML_Note = 'bg-success text-light'
 HTML_Warn = 'bg-warning text-dark'
 HTML_Alert = 'bg-danger text-light'
 
 # ==================================================================================================
-# Call a named WebHook
+# Get_Update_String - Called from the API end point or from the APPScheduler function
 # ==================================================================================================
 def Get_Update_String():
     Result = ""
@@ -25,7 +24,8 @@ def Get_Update_String():
             return Result
         try:
             Page_JSON = json.loads(Response.read())
-            current_app.logger.debugv("JSON Returned by Github {}".format( json.dumps(Page_JSON, indent=4)))
+            current_app.logger.debugv("JSON Returned by Github {}".format(
+                                                    json.dumps(Page_JSON, indent=4)))
 
             if len(Page_JSON) > 0:
                 Current_Version = "v" + current_app.config['APP_VERSION']
@@ -56,7 +56,8 @@ def Get_Update_String():
                         Result = HTML_Update.format(url=Link, style=Style_Text, text=Ver_Text)
                         continue
         except json.decoder.JSONDecodeError as Error:
-            current_app.logger.warning("JSON Returned by Github could not be parsed {}".format(Error))
+            current_app.logger.warning("JSON Returned by Github could not be parsed {}".format(
+                                                                                        Error))
     except HTTPError as Error:
         if hasattr(Error, 'reason'):
             current_app.logger.warning("Failed to call Github API. Reason: {}".format(Error.reason))
@@ -67,3 +68,9 @@ def Get_Update_String():
         if hasattr(Error, 'reason'):
             current_app.logger.warning("Failed to call Github API. Reason: {}".format(Error.reason))
     return Result
+
+# ==================================================================================================
+# Set_Config_Update_String - Called by APScheduler
+# ==================================================================================================
+def Set_Config_Update_String():
+    current_app.config.update(UPDATE_HTML = Get_Update_String())

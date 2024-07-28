@@ -1,7 +1,5 @@
-from flask import current_app
-
 import re
-
+from flask import current_app
 from app.utils import server_constants
 
 # =======================================================================

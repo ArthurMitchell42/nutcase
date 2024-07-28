@@ -9,7 +9,7 @@ from app.utils import configuration
 from app.utils import apc_to_nut
 
 # =============================================================================
-# Constatnts for GUI
+# region Constatnts for GUI
 # =============================================================================
 Icon_Line            = 'bi-plugin'
 Icon_Bat_Charging    = 'bi-battery-charging'
@@ -79,7 +79,7 @@ Device_Pulldown_HTML = \
 <a class="dropdown-item {active}" href="/?addr={addr}&dev={dev}{mode_q}">
     <div class="d-flex align-items-center justify-content-between">
     <div>{addr_name} {dev_name} {mode}</div>
-    <div><i class="bi bi-check-circle {def_style}"></i></div>
+    <div>&nbsp<i class="bi bi-check-circle {def_style}"></i></div>
     </div>
 </a>
 '''
@@ -103,6 +103,7 @@ Log_File_Pulldown_HTML = \
 </li>'''
 
 # =============================================================================
+# region Utils
 # Clean_List - Utility to clean 'null' values from data so that the max
 #   and min functions work
 # =============================================================================
@@ -126,7 +127,8 @@ def Time_Axis_Array(Length):
     return list(reversed(X_Data))
 
 # ==========================================================
-# Dougnut graphics - Dougnut_Input_Voltage
+# region Dougnuts
+# Dougnut_Input_Voltage
 # ==========================================================
 def Dougnut_Input_Voltage(UPS, Result):
     if Input_Volts := format_to_text.Get_NUT_Variable(UPS, 'input.voltage'):
@@ -250,10 +252,9 @@ def Dougnut_Output_Power(UPS, Result):
         UPS_Load = float(UPS_Load)
 
         Realpower_Nom = format_to_text.Get_NUT_Variable(UPS, 'ups.realpower.nominal')
-        if Server := configuration.Get_Server(current_app, UPS['server_address']):
-            if 'power' in Server:
-                Realpower_Nom = Server['power']
-                # current_app.logger.debug("Using power value from config {}".format(Realpower_Nom))
+        if Device := configuration.Get_Device(UPS['server_address'], UPS['name']):
+            if 'power' in Device:
+                Realpower_Nom = Device['power']
 
         if Realpower_Nom:
             Power_Watts = int(float(Realpower_Nom) * (UPS_Load / 100))
@@ -264,19 +265,22 @@ def Dougnut_Output_Power(UPS, Result):
     return
 
 # ==========================================================
-# Chart graphics - Chart_Input_Voltage
+# region Charts
+# Chart_Input_Voltage
 # ==========================================================
 def Chart_Input_Voltage(UPS, Result):
-    Vin_Y = session['in_volt_y']
+    Target_Device = UPS['name'] + "_" + UPS['server_address']
+    Vin_Y = session[Target_Device]['in_volt_y']
+
     if Input_Volts := format_to_text.Get_NUT_Variable(UPS, 'input.voltage'):
         Input_Volts = float(Input_Volts)
     else:
         Input_Volts = 0
-    # if Input_Volts:
+
     Vin_Y.append(Input_Volts)
     Vin_Y.pop(0)
     Result['in_volt_y'] = Vin_Y
-    session['in_volt_y'] = Vin_Y
+    session[Target_Device]['in_volt_y'] = Vin_Y
 
     # ==========================================================
     # Select a minumum range for the Y axis
@@ -303,7 +307,8 @@ def Chart_Input_Voltage(UPS, Result):
 # Chart graphics - Chart_Battery_Charge
 # ==========================================================
 def Chart_Battery_Charge(UPS, Result):
-    Charge_Y = session['bat_ch_y']
+    Target_Device = UPS['name'] + "_" + UPS['server_address']
+    Charge_Y = session[Target_Device]['bat_ch_y']
 
     if not (Bat_Charge := format_to_text.Get_NUT_Variable(UPS, 'battery.charge')):
         Bat_Charge = 0
@@ -312,14 +317,16 @@ def Chart_Battery_Charge(UPS, Result):
     Charge_Y.append(int(Bat_Charge))
     Charge_Y.pop(0)
     Result['bat_ch_y'] = Charge_Y
-    session['bat_ch_y'] = Charge_Y
+    session[Target_Device]['bat_ch_y'] = Charge_Y
     return
 
 # ==========================================================
 # Chart graphics - Chart_Output_Power
 # ==========================================================
 def Chart_Output_Power(UPS, Result):
-    Power_Y = session['out_power_y']
+    Target_Device = UPS['name'] + "_" + UPS['server_address']
+    Power_Y = session[Target_Device]['out_power_y']
+
     if not (UPS_Load := format_to_text.Get_NUT_Variable(UPS, 'ups.load')):
         UPS_Load = 0
 
@@ -327,7 +334,7 @@ def Chart_Output_Power(UPS, Result):
     Power_Y.append(UPS_Load)
     Power_Y.pop(0)
     Result['out_power_y'] = Power_Y
-    session['out_power_y'] = Power_Y
+    session[Target_Device]['out_power_y'] = Power_Y
 
     # ==========================================================
     # Select a minumum range for the Y axis
@@ -352,9 +359,10 @@ def Chart_Output_Power(UPS, Result):
     # Set Watts scale
     # ==========================================================
     Realpower_Nom = format_to_text.Get_NUT_Variable(UPS, 'ups.realpower.nominal')
-    if Server := configuration.Get_Server(current_app, UPS['server_address']):
-        if 'power' in Server:
-            Realpower_Nom = Server['power']
+
+    if Device := configuration.Get_Device(UPS['server_address'], UPS['name']):
+        if 'power' in Device:
+            Realpower_Nom = Device['power']
             current_app.logger.debugv(
                 "Chart_Output_Power: Using power value from config {}".format(
                     Realpower_Nom))
@@ -374,7 +382,9 @@ def Chart_Output_Power(UPS, Result):
 # Chart graphics - Chart_Runtime
 # ==========================================================
 def Chart_Runtime(UPS, Result):
-    Runtime_Y = session['runtime_y']
+    Target_Device = UPS['name'] + "_" + UPS['server_address']
+    Runtime_Y = session[Target_Device]['runtime_y']
+
     if not (Runtime := format_to_text.Get_NUT_Variable(UPS, 'battery.runtime')):
         Runtime = 0
 
@@ -382,7 +392,7 @@ def Chart_Runtime(UPS, Result):
         Runtime_Y.append(float(Runtime) / 60.0)
         Runtime_Y.pop(0)
     Result['runtime_y'] = Runtime_Y
-    session['runtime_y'] = Runtime_Y
+    session[Target_Device]['runtime_y'] = Runtime_Y
 
     if current_app.config['UI']['AUTORANGE_RUN']:
         Min_Range  = current_app.config['UI']['MIN_RANGE_RUN']
@@ -402,6 +412,7 @@ def Chart_Runtime(UPS, Result):
     return
 
 # =============================================================================
+# region Others
 # Process_Runtime_Block -
 # =============================================================================
 def Process_Runtime_Block(UPS, Result):
@@ -531,7 +542,7 @@ def Process_Status_Block(UPS, Result):
 
     # ==========================================================
     # Status block - server ID
-    Server = configuration.Get_Server(current_app, UPS['server_address'])
+    Server = configuration.Get_Server(UPS['server_address'])
 
     if Server:
         if 'name' in Server:
@@ -548,7 +559,7 @@ def Process_Status_Block(UPS, Result):
     if Status_Var:
         Status_Var = Status_Var.upper()
         Search_List = re.split(r' |:|;|-|\.|/|\\', Status_Var)
-        current_app.logger.debug("Status message: {}".format(Search_List))
+        current_app.logger.debugv("Status message: {}".format(Search_List))
 
         # ==========================================================
         # Process line information
@@ -678,10 +689,12 @@ def Process_Status_Block(UPS, Result):
     # ==========================================================
     # Status block drop down
     Result['ups_status'] = Status_Var
+
+    Result['ups_temp'] = "Not Present"
     if UPS_Temp := format_to_text.Get_NUT_Variable(UPS, 'ups.temperature'):
-        Result['ups_temp'] = UPS_Temp + "&deg;C"
-    else:
-        Result['ups_temp'] = "Not Present"
+        Result['ups_temp'] = UPS_Temp + "&deg;C (UPS)"
+    elif UPS_Temp := format_to_text.Get_NUT_Variable(UPS, 'battery.temperature'):
+        Result['ups_temp'] = UPS_Temp + "&deg;C (Bat)"
 
     if APC_Status := format_to_text.Get_NUT_Variable(UPS, 'STATUS'):
         Result['apc_status'] = APC_Status
@@ -726,41 +739,42 @@ def Process_Status_Block(UPS, Result):
 def Process_Device_Pulldown(Addr, Device, Result):
     Result['device_menu'] = ""
 
-    for d in current_app.config['SERVERS']:
-        if 'default' in d:
-            Def_Style = ''
-        else:
-            Def_Style = 'd-none'
+    for svr in current_app.config['SERVERS']:
+        for dev in svr['devices']:
+            if 'default' in dev:
+                Def_Style = 'text-warning'
+            else:
+                Def_Style = 'd-none'
 
-        if Addr == d['server'] and Device == d['device']:
-            Active_Item = 'active'
-        else:
-            Active_Item = ''
+            if Addr == svr['server'] and Device == dev['device']:
+                Active_Item = 'active'
+            else:
+                Active_Item = ''
 
-        Mode_Query = '&mode=nut'
-        Mode_Text  = ' (NUT)'
-        if 'mode' in d:
-            if d['mode'].lower() == 'apc':
-                Mode_Query = '&mode=apc'
-                Mode_Text  = ' (APC)'
+            Mode_Query = '&mode=nut'
+            Mode_Text  = ' (NUT)'
+            if 'mode' in svr:
+                if svr['mode'].lower() == 'apc':
+                    Mode_Query = '&mode=apc'
+                    Mode_Text  = ' (APC)'
 
-        if 'name' in d:
-            Addr_Name = d['name']
-            Dev_Name = ''
-        else:
-            Addr_Name = d['server']
-            Dev_Name = d['device']
+            if 'displayname' in dev:
+                Addr_Name = dev['displayname']
+                Dev_Name = ''
+            else:
+                Addr_Name = svr['server']
+                Dev_Name = dev['device']
 
-        Result['device_menu'] += Device_Pulldown_HTML.format(
-            addr      = d['server'],
-            dev       = d['device'],
-            addr_name = Addr_Name,
-            dev_name  = Dev_Name,
-            mode      = Mode_Text,
-            mode_q    = Mode_Query,
-            def_style = Def_Style,
-            active    = Active_Item
-       )
+            Result['device_menu'] += Device_Pulldown_HTML.format(
+                addr      = svr['server'],
+                dev       = dev['device'],
+                addr_name = Addr_Name,
+                dev_name  = Dev_Name,
+                mode      = Mode_Text,
+                mode_q    = Mode_Query,
+                def_style = Def_Style,
+                active    = Active_Item
+            )
     return Result
 
 # =============================================================================
@@ -805,7 +819,7 @@ def Process_Download_Pulldown(UPS, Result, Mode):
 # =============================================================================
 def Generate_Log_Files_Pulldown(Directory):
     Menu_HTML = ""
-    Max_Files = 12
+    Max_Files = current_app.config['UI']["LOGFILES_LIST"]
 
     Files = os.listdir(Directory)
 
@@ -816,8 +830,10 @@ def Generate_Log_Files_Pulldown(Directory):
 
         for f in Files:
             Full_Name = os.path.join(Directory, f)
-            File_Age = time.time() - os.path.getmtime(Full_Name)
+            if os.path.isdir(Full_Name):
+                continue
 
+            File_Age = time.time() - os.path.getmtime(Full_Name)
             Age_String = arrow.get(os.path.getmtime(Full_Name)).humanize(arrow.utcnow(),
                                                 only_distance=True) + " ago"
             if Age_String == 'instantly ago':
@@ -841,6 +857,7 @@ def Generate_Log_Files_Pulldown(Directory):
     return Menu_HTML
 
 # =============================================================================
+# region Main
 # Process_Data_For_GUI -
 # =============================================================================
 def Process_Data_For_GUI(Scrape_Data, Device):
@@ -860,13 +877,30 @@ def Process_Data_For_GUI(Scrape_Data, Device):
     # Get the UPS dictionary from the raw structure
     # ==========================================================
     UPS = format_to_text.Get_UPS(Scrape_Data, Device)
-    current_app.logger.debug(
+    current_app.logger.debugv(
         "Process_Data_For_GUI: UPS dictionary {} target Device {}".format(UPS, Device))
     if not UPS:
         current_app.logger.warning("Could not find device {} in scrape data".format(Device))
         return {}
     else:
-        current_app.logger.debug("Found device {} in scrape data".format(Device))
+        current_app.logger.debugv("Found device {} in scrape data".format(Device))
+
+    # ==========================================================
+    # Initialise space for the chart data if it's not present
+    # ==========================================================
+    if 'touch' not in session:
+        session['touch'] = False
+    session['touch'] = not session['touch']
+
+    Target_Device = UPS['name'] + "_" + UPS['server_address']
+    if (Target_Device not in session):
+        Length = current_app.config['CHART_SAMPLES']
+        Empty_List = ['null' for i in range(Length)]
+        session[Target_Device] = {}
+        session[Target_Device]['bat_ch_y'] = Empty_List.copy()
+        session[Target_Device]['in_volt_y'] = Empty_List.copy()
+        session[Target_Device]['out_power_y'] = Empty_List.copy()
+        session[Target_Device]['runtime_y'] = Empty_List.copy()
 
     # ==========================================================
     # Status block

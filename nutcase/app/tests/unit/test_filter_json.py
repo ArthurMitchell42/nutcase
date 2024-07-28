@@ -1,6 +1,4 @@
 import unittest
-# import flask
-
 from app.utils.format_to_json import Filter_JSON
 
 # =================================================================================================
@@ -153,7 +151,6 @@ class Test_filter_json_basics(unittest.TestCase):
         Missing_Key = 'ups1/clients/list/'
         JSON_Elements = [Missing_Key]
         Output_Dict = Filter_JSON(Input_Dict, JSON_Elements)
-        # print("Output_Dict: {}".format(Output_Dict))
         self.assertEqual(Output_Dict, {Missing_Key: "Index " + Missing_Key +
                                        " not found invalid literal for int() with base 10: ''"})
 
@@ -162,7 +159,6 @@ class Test_filter_json_basics(unittest.TestCase):
         Missing_Key = 'ups1/clients/list/5'
         JSON_Elements = [Missing_Key]
         Output_Dict = Filter_JSON(Input_Dict, JSON_Elements)
-        # print("Output_Dict: {}".format(Output_Dict))
         self.assertEqual(Output_Dict, {Missing_Key: "Index " + Missing_Key +
                                        " not found list index out of range"})
 

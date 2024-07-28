@@ -1,7 +1,6 @@
 import unittest
 import flask
 import unittest.mock as mock
-from unittest.mock import call
 
 from http import HTTPStatus
 from urllib.error import URLError, HTTPError
@@ -47,7 +46,7 @@ class Test_get_update_string(BaseTestCase):
             Rtn = Get_Update_String()
             self.assertEqual(cm.output, [
                 "WARNING:tests.unit.test_get_update_string:Failed to call Github API. "
-                                                        "Reason: Bad request",
+                "Reason: Bad request",
                 "WARNING:tests.unit.test_get_update_string:Github couldn't fulfill request Error: 400"
                 ])
 
@@ -93,7 +92,7 @@ class Test_get_update_string(BaseTestCase):
             Rtn = Get_Update_String()
             self.assertEqual(cm.output, [
                 "WARNING:tests.unit.test_get_update_string:JSON Returned by Github could not be "
-                                    "parsed Expecting value: line 1 column 1 (char 0)",
+                "parsed Expecting value: line 1 column 1 (char 0)",
                 ])
 
         self.assertEqual(Rtn, "")
@@ -105,7 +104,7 @@ class Test_get_update_string(BaseTestCase):
         rtn_obj = Urlopen(url, code=HTTPStatus.OK, read_data='[]')
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertNoLogs('tests', level='DEBUG') as cm:
+        with self.assertNoLogs('tests', level='DEBUG'):
             Rtn = Get_Update_String()
             # self.assertEqual(cm.output, [])
 
@@ -119,7 +118,7 @@ class Test_get_update_string(BaseTestCase):
         rtn_obj = Urlopen(url, code=HTTPStatus.OK, read_data=Test_prerel_JSON)
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertNoLogs('tests', level='DEBUG') as cm:
+        with self.assertNoLogs('tests', level='DEBUG'):
             Rtn = Get_Update_String()
 
         self.assertEqual(Rtn, "")
@@ -134,7 +133,7 @@ class Test_get_update_string(BaseTestCase):
         rtn_obj = Urlopen(url, code=HTTPStatus.OK, read_data=Test_prerel_JSON)
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertNoLogs('tests', level='DEBUG') as cm:
+        with self.assertNoLogs('tests', level='DEBUG'):
             Rtn = Get_Update_String()
         # print("Rtn: {}".format(Rtn))
         self.assertEqual(Rtn, '<a href="https://github/V0.3.2a_pre_release" target="_blank" class="text-decoration-none text-small badge rounded-pill bg-success text-light">V0.3.2a_pre_release</a>')
@@ -149,7 +148,7 @@ class Test_get_update_string(BaseTestCase):
         rtn_obj = Urlopen(url, code=HTTPStatus.OK, read_data=Test_prerel_JSON)
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertNoLogs('tests', level='DEBUG') as cm:
+        with self.assertNoLogs('tests', level='DEBUG'):
             Rtn = Get_Update_String()
         # print("Rtn: {}".format(Rtn))
         self.assertEqual(Rtn, '<a href="https://github/V0.3.1_release" target="_blank" class="text-decoration-none text-small badge rounded-pill bg-warning text-dark">V0.3.1_release</a>')
@@ -164,7 +163,7 @@ class Test_get_update_string(BaseTestCase):
         rtn_obj = Urlopen(url, code=HTTPStatus.OK, read_data=Test_urgent_JSON)
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertNoLogs('tests', level='DEBUG') as cm:
+        with self.assertNoLogs('tests', level='DEBUG'):
             Rtn = Get_Update_String()
         print("Rtn: {}".format(Rtn))
         self.assertEqual(Rtn, '<a href="https://github/V0.3.2a_pre_release" target="_blank" class="text-decoration-none text-small badge rounded-pill bg-danger text-light">V0.3.2a_pre_release</a>')
@@ -179,7 +178,7 @@ class Test_get_update_string(BaseTestCase):
         rtn_obj = Urlopen(url, code=HTTPStatus.OK, read_data=Test_urgent_JSON)
         mock_urlopen.return_value = rtn_obj
 
-        with self.assertNoLogs('tests', level='DEBUG') as cm:
+        with self.assertNoLogs('tests', level='DEBUG'):
             Rtn = Get_Update_String()
         print("Rtn: {}".format(Rtn))
         self.assertEqual(Rtn, '<a href="https://github/V0.3.1_release" target="_blank" class="text-decoration-none text-small badge rounded-pill bg-danger text-light">V0.3.1_release</a>')

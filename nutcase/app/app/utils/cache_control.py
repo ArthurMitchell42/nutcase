@@ -1,6 +1,5 @@
-from flask import current_app
-
 import time
+from flask import current_app
 
 # =======================================================================
 # Fetch_From_Cache
@@ -25,7 +24,7 @@ def Fetch_From_Cache(Target_Address, Target_Port):
 
 # =======================================================================
 # Add_To_Cache
-#  =======================================================================
+# =======================================================================
 def Add_To_Cache(Target_Address, Target_Port, Scrape_Data):
     # If config CACHE_PERIOD is 0 then don't cache
     if current_app.config["CACHE_PERIOD"] == 0:

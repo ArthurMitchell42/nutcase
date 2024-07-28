@@ -1,5 +1,4 @@
 from flask import current_app
-
 import re
 import socket
 from enum import Enum
@@ -226,6 +225,8 @@ def Logout_NUT_Server(Socket_File, Debug_Lines):
 # Connect_To_NUT_Server
 # ======================================================================
 def Connect_To_NUT_Server(Target_Address, Target_Port, Credentials):
+    Scrape_Data = {}
+
     # ==================================================================
     # Open a socket to the server
     # ==================================================================
@@ -236,7 +237,7 @@ def Connect_To_NUT_Server(Target_Address, Target_Port, Credentials):
         Skt.connect((Target_Address, Target_Port))
     except Exception as Error:
         current_app.logger.error('Unable to connect to NUT server: {}'.format(Error))
-        return False, []
+        return False, Scrape_Data
 
     # ==================================================================
     # Make a virtual file from the socket to enable reading lines
@@ -250,7 +251,7 @@ def Connect_To_NUT_Server(Target_Address, Target_Port, Credentials):
     if Credentials:
         if not Login_NUT_Server(Socket_File, Credentials, Debug_Lines):
             current_app.logger.error("Login failed.")
-            return False, []
+            return False, Scrape_Data
 
     # ==================================================================
     # Query_NUT_Version
@@ -260,7 +261,7 @@ def Connect_To_NUT_Server(Target_Address, Target_Port, Credentials):
         current_app.logger.debugv("NUT Version: {}".format(NUT_Version))
     else:
         current_app.logger.error("Scrape abandoned while reading version.")
-        return False, []
+        return False, Scrape_Data
 
     # ==================================================================
     # Read the list of UPS devices being served
@@ -270,7 +271,7 @@ def Connect_To_NUT_Server(Target_Address, Target_Port, Credentials):
         current_app.logger.debugv("NUT UPS's: {}".format(UPSs))
     else:
         current_app.logger.error("Scrape abandoned while listing UPS's.")
-        return False, []
+        return False, Scrape_Data
 
     for d in UPSs:
         d['server_address'] = Target_Address
@@ -283,7 +284,7 @@ def Connect_To_NUT_Server(Target_Address, Target_Port, Credentials):
         current_app.logger.error("Scrape abandoned while listing variables.")
         Skt.close()
         current_app.logger.debugv("Connection to server closed")
-        return False, []
+        return False, Scrape_Data
 
     # ==================================================================
     # Get the client machines for all listed UPS devices
@@ -301,7 +302,6 @@ def Connect_To_NUT_Server(Target_Address, Target_Port, Credentials):
     Skt.close()
     current_app.logger.debugv("Connection to server closed")
 
-    Scrape_Data = {}
     Scrape_Data["nutcase_version"] = current_app.config['APP_NAME'] + " " \
                                         + current_app.config['APP_VERSION']
     Scrape_Data["server_version"]  = NUT_Version
@@ -325,7 +325,9 @@ def Scrape_NUT_Server(Target_Address, Target_Port = 3493):
             Credentials = Cred
             break
 
-    current_app.logger.debugv("Will use {} to log in to {}".format(Credentials, Target_Address))
+    if Credentials:
+        current_app.logger.debugv("Will use {} to log in to {}".format(Credentials, Target_Address))
+
     Status, Scrape_Data = Connect_To_NUT_Server(Target_Address, Target_Port, Credentials)
 
     if Status:

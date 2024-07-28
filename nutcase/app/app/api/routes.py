@@ -52,12 +52,16 @@ def route_default():
         return Result
 
     for s in current_app.config['SERVERS']:
-        Result['addr']   = s['server']
-        Result['port']   = s['port']
-        Result['device'] = s['device']
-        if 'default' in s:
-            break
-
+        if 'devices' in s:
+            for d in s['devices']:
+                print("route default: device {}".format(d))
+                Result['addr']   = s['server']
+                Result['port']   = s['port']
+                Result['device'] = d['device']
+                if 'default' in d:
+                    if d['default']:
+                        print("route default: return {} as default".format(d))
+                        return Result
     return Result
 
 # ====================================================================================
@@ -96,7 +100,5 @@ def route_events():
 @bp.route('/appupdate')
 def route_appupdate():
     Result = {}
-
-    Result['app_update'] = api_utils.Get_Update_String()
-
+    Result['app_update'] = api_utils.Get_Update_String(current_app)
     return Result

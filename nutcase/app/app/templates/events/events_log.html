@@ -7,25 +7,26 @@
 
 <div class="container mt-1 rounded">
 
-
-  <div class="d-flex flex-column flex-fillm-0">
+  <div class="d-flex flex-column flex-fill m-0 pt-1">
     <div class="d-flex align-content-center justify-content-between">
 
       <div class="d-flex d-grid gap-2">
         <button class="btn btn-sm btn-success" type="button" onclick="Submit_Action('clear')"><i class="bi bi-x-square-fill"></i> Clear</button>
         <button class="btn btn-sm btn-success" type="button" onclick="Submit_Action('reset')"><i class="bi bi-check2-all"></i> Mark read</button>
+        <button class="btn btn-sm btn-success" type="button" onclick="Submit_Action('refresh')"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
       </div>
-
 
       <div class="d-flex">
         <form action = "" method = "POST" id="event_form" enctype = "multipart/form-data">
           {{ form.hidden_tag() }}
-          {{ form.Event_Level.label(class="form-label small text-muted p-0 m-0") }}
-          {{ form.Event_Level(class='btn btn-secondary btn-sm', onchange="Submit_Action('redraw')") }}
-          {{ form.Lines_Per_Page.label(class="form-label small text-muted p-0 m-0") }}
-          {{ form.Lines_Per_Page(class='btn btn-secondary btn-sm', onchange="Submit_Action('redraw')") }}
+          <div class="d-flex d-inline text-nowrap">
+          {{ form.Event_Level.label(class="form-label text-muted pt-1 pb-0 pe-1 m-0") }}
+          {{ form.Event_Level(class='form-select form-select-sm bg-success-subtle', onchange="Submit_Action('redraw')") }} <!--btn-secondary -->
+          {{ form.Lines_Per_Page.label(class="form-label text-muted ps-2 pe-1 pt-1 pb-0 m-0") }}
+          {{ form.Lines_Per_Page(class='form-select form-select-sm bg-success-subtle', onchange="Submit_Action('redraw')") }} <!-- btn-secondary -->
+          </div>
         </form>
-      </div> 
+      </div>
     </div>
 
     <div class="d-flex align-content-center justify-content-center pt-2">
@@ -35,10 +36,12 @@
     </div>
 
   </div>
-
-  <table class="table table-sm table-responsive table-hover table-striped" data-bs-theme=''>
+<hr>
+  <div class="table-responsive">
+  <table class="table table-sm table-hover" data-bs-theme=''> <!-- table-striped-->
   {{event_table}}
   </table>
+  </div>
 
 </div>
 
@@ -64,7 +67,7 @@
             </div>
             <div class="d-flex flex-column flex-fill align-items-end">
               <a href="https://www.paypal.com/donate?hosted_button_id=N6F4E9YCD5VC8" style="text-decoration: none;">
-                <img src="/static/images/paypal_donate.jpg" class="rounded float-end" 
+                <img src="/static/images/paypal_donate.jpg" class="rounded float-end"
             width="100" height="100"  alt="Like the app? Then why not buy me a coffee.">
               </a>
             </div>
@@ -97,7 +100,7 @@ function Submit_Action( Action ) {
    hidden.value = Action;
    form_el = document.getElementById("event_form");
    form_el.appendChild(hidden);
-   form_el.submit();   
+   form_el.submit();
 }
 
 // function Change_Level() {

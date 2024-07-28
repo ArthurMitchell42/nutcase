@@ -5,190 +5,9 @@ from struct import pack, unpack_from
 import re
 import time
 
-# from app.api import scrape
 from app.utils import format_to_text
 from app.utils import apc_to_nut
 from app.utils import rework_data
-
-# Test_Data_Back_UPS_ES_700G = [
-#     "APC      : 001,034,0853",
-#     "DATE     : 2024-01-02 22:02:53 +0300",
-#     "HOSTNAME : DESKTOP-UREEQQ0",
-#     "VERSION  : 3.14.14 (31 May 2016) mingw",
-#     "UPSNAME  : APC Back-UPS ES 700",
-#     "CABLE    : USB Cable",
-#     "DRIVER   : USB UPS Driver",
-#     "UPSMODE  : Stand Alone",
-#     "STARTTIME: 2024-01-01 15:27:43 +0300",
-#     "MODEL    : Back-UPS ES 700G",
-#     "STATUS   : ONLINE",
-#     "LINEV    : 232.0 Volts",
-#     "LOADPCT  : 6.0 Percent",
-#     "BCHARGE  : 100.0 Percent",
-#     "TIMELEFT : 32.9 Minutes",
-#     "MBATTCHG : 5 Percent",
-#     "MINTIMEL : 3 Minutes",
-#     "MAXTIME  : 0 Seconds",
-#     "SENSE    : Medium",
-#     "LOTRANS  : 190.0 Volts",
-#     "HITRANS  : 256.0 Volts",
-#     "ALARMDEL : No alarm",
-#     "BATTV    : 13.7 Volts",
-#     "LASTXFER : Automatic or explicit self test",
-#     "NUMXFERS : 0",
-#     "TONBATT  : 0 Seconds",
-#     "CUMONBATT: 0 Seconds",
-#     "XOFFBATT : N/A",
-#     "STATFLAG : 0x05000008",
-#     "SERIALNO : 5B1637T49067",
-#     "BATTDATE : 2016-09-18",
-#     "NOMINV   : 230 Volts",
-#     "NOMBATTV : 12.0 Volts",
-#     "FIRMWARE : 871.O4 .I USB FW:O4",
-#     "END APC  : 2024-01-02 22:03:28 +0300"
-# ]
-
-# Test_Data_Back_UPS_RS_1500 = [
-#     "APC      : 001,037,0906",
-#     "DATE     : Sun Apr 26 17:22:22 EDT 2009",
-#     "HOSTNAME : mail.kroptech.com",
-#     "VERSION  : 3.14.2 (10 September 2007) redhat",
-#     "UPSNAME  : ups0",
-#     "CABLE    : USB Cable",
-#     "MODEL    : Back-UPS RS 1500",
-#     "UPSMODE  : Stand Alone",
-#     "STARTTIME: Sun Apr 26 10:22:46 EDT 2009",
-#     "STATUS   : ONLINE",
-#     "LINEV    : 123.0 Volts",
-#     "LOADPCT  :  24.0 Percent Load Capacity",
-#     "BCHARGE  : 100.0 Percent",
-#     "TIMELEFT : 144.5 Minutes",
-#     "MBATTCHG : 5 Percent",
-#     "MINTIMEL : 3 Minutes",
-#     "MAXTIME  : 0 Seconds",
-#     "SENSE    : Medium",
-#     "LOTRANS  : 097.0 Volts",
-#     "HITRANS  : 138.0 Volts",
-#     "ALARMDEL : Always",
-#     "BATTV    : 26.8 Volts",
-#     "LASTXFER : Low line voltage",
-#     "NUMXFERS : 0",
-#     "TONBATT  : 0 seconds",
-#     "CUMONBATT: 0 seconds",
-#     "XOFFBATT : N/A",
-#     "SELFTEST : NO",
-#     "STATFLAG : 0x07000008 Status Flag",
-#     "MANDATE  : 2003-05-0",
-#     "SERIALNO : JB0319033692",
-#     "BATTDATE : 2001-09-25",
-#     "NOMINV   : 120",
-#     "NOMBATTV :  24.0",
-#     "FIRMWARE : 8.g6 .D USB FW:g6",
-#     "APCMODEL : Back-UPS RS 1500",
-#     "END APC  : Sun Apr 26 17:22:32 EDT 2009"
-#     ]
-
-# Test_Data_Smart_UPS_600 = [
-#     "APC      : 001,048,1088",
-#     "DATE     : Fri Dec 03 16:49:24 EST 1999",
-#     "HOSTNAME : daughter",
-#     "RELEASE  : 3.7.2",
-#     "CABLE    : APC Cable 940-0024C",
-#     "MODEL    : APC Smart-UPS 600",
-#     "UPSMODE  : Stand Alone",
-#     "UPSNAME  : SU600",
-#     "LINEV    : 122.1 Volts",
-#     "MAXLINEV : 123.3 Volts",
-#     "MINLINEV : 122.1 Volts",
-#     "LINEFREQ : 60.0 Hz",
-#     "OUTPUTV  : 122.1 Volts",
-#     "LOADPCT  :  32.7 Percent Load Capacity",
-#     "BATTV    : 26.6 Volts",
-#     "BCHARGE  : 095.0 Percent",
-#     "MBATTCHG : 15 Percent",
-#     "TIMELEFT :  19.0 Minutes",
-#     "MINTIMEL : 3 Minutes",
-#     "SENSE    : Medium",
-#     "DWAKE    : 000 Seconds",
-#     "DSHUTD   : 020 Seconds",
-#     "LOTRANS  : 106.0 Volts",
-#     "HITRANS  : 129.0 Volts",
-#     "RETPCT   : 010.0 Percent",
-#     "STATFLAG : 0x08 Status Flag",
-#     "S--TATFLAG : 0xD0 Status Flag",
-#     "STATUS   : ONLINE",
-#     "ITEMP    : 34.6 C Internal",
-#     "ALARMDEL : Low Battery",
-#     "LASTXFER : Unacceptable Utility Voltage Change",
-#     "SELFTEST : NO",
-#     "STESTI   : 336",
-#     "DLOWBATT : 05 Minutes",
-#     "DIPSW    : 0x00 Dip Switch",
-#     "REG1     : N/A",
-#     "REG2     : N/A",
-#     "REG3     : 0x00 Register 3",
-#     "MANDATE  : 03/30/95",
-#     "SERIALNO : 13035861",
-#     "BATTDATE : 05/05/98",
-#     "NOMOUTV  : 115.0",
-#     "NOMBATTV :  24.0",
-#     "HUMIDITY : N/A",
-#     "AMBTEMP  : N/A",
-#     "EXTBATTS : N/A",
-#     "BADBATTS : N/A",
-#     "FIRMWARE : N/A",
-#     "APCMODEL : 6TD",
-#     "END APC  : Fri Dec 03 16:49:25 EST 1999",
-#     ]
-
-# Test_Data_Back_UPS_BF500 = [
-#     "APC      : 001,045,1036",
-#     "DATE     : 2024-01-02 22:35:57 +0300",
-#     "HOSTNAME : HOME-PC",
-#     "VERSION  : 3.14.14 (31 May 2016) mingw",
-#     "UPSNAME  : HOME-PC",
-#     "CABLE    : USB Cable",
-#     "DRIVER   : USB UPS Driver",
-#     "UPSMODE  : Stand Alone",
-#     "STARTTIME: 2024-01-02 22:35:31 +0300",
-#     "MODEL    : Back-UPS BF500",
-#     "STATUS   : ONLINE",
-#     "LINEV    : 232.0 Volts",
-#     "LOADPCT  : 19.0 Percent",
-#     "BCHARGE  : 100.0 Percent",
-#     "TIMELEFT : 23.1 Minutes",
-#     "MBATTCHG : 5 Percent",
-#     "MINTIMEL : 3 Minutes",
-#     "MAXTIME  : 0 Seconds",
-#     "OUTPUTV  : 230.0 Volts",
-#     "SENSE    : Medium",
-#     "DWAKE    : 0 Seconds",
-#     "DSHUTD   : 0 Seconds",
-#     "LOTRANS  : 180.0 Volts",
-#     "HITRANS  : 266.0 Volts",
-#     "RETPCT   : 0.0 Percent",
-#     "ITEMP    : 29.2 C",
-#     "ALARMDEL : No alarm",
-#     "BATTV    : 13.6 Volts",
-#     "LINEFREQ : 50.0 Hz",
-#     "LASTXFER : Low line voltage",
-#     "NUMXFERS : 0",
-#     "TONBATT  : 0 Seconds",
-#     "CUMONBATT: 0 Seconds",
-#     "XOFFBATT : N/A",
-#     "SELFTEST : NO",
-#     "STESTI   : None",
-#     "STATFLAG : 0x05000008",
-#     "MANDATE  : 2006-01-19",
-#     "SERIALNO : AB0604341606",
-#     "BATTDATE : 2006-07-27",
-#     "NOMOUTV  : 230 Volts",
-#     "NOMINV   : 230 Volts",
-#     "NOMBATTV : 12.0 Volts",
-#     "NOMPOWER : 325 Watts",
-#     "FIRMWARE : 814.s3.I  USB FW:s3",
-#     "END APC  : 2024-01-02 22:36:08 +0300"
-# ]
 
 # ===================================================================================================
 # Strip_Units - A list of variables that will be processed if the apc_strip_units option is active
@@ -222,7 +41,6 @@ Strip_List = [
 ]
 
 def Strip_Units(Scrape_Data):
-
     for v in Scrape_Data['ups_list'][0]['variables']:
         if v['name'] in Strip_List:
             From = format_to_text.Get_NUT_Variable(Scrape_Data['ups_list'][0], v['name'])
@@ -283,7 +101,6 @@ def Parse_Packet_To_Lines(Byte_Data):
         for item in Byte_tup:
             Line += chr(item)
 
-        # Lines.append(Line.rstrip('\n'))
         Lines.append(Line)
     return Lines
 
@@ -346,7 +163,7 @@ def Format_APC_Data(Scrape_Lines):
     Scrape_Data["nutcase_version"] = current_app.config['APP_NAME'] + \
                                         " " + current_app.config['APP_VERSION']
     Scrape_Data["server_version"]  = Server_Version
-    Scrape_Data["mode"]            = "apc"  # scrape.Server_Protocol.APC
+    Scrape_Data["mode"]            = "apc"
     Scrape_Data["ups_list"]        = [UPS]
     Scrape_Data["debug"]           = Scrape_Lines
 
@@ -368,9 +185,6 @@ def Get_APC_Log(Target_Address, Target_Port = 3551):
         return False, {}
 
     Scrape_Lines = Parse_Packet_To_Lines(Byte_Data)
-    # current_app.logger.debugv("Log lines:")
-    # for Line in Scrape_Lines:
-    #     current_app.logger.debugv("  {}".format(Line.rstrip('\n')))
 
     return Scrape_Lines
 
@@ -422,8 +236,6 @@ def Scrape_APC_Server(Target_Address, Target_Port = 3551):
         apc_to_nut.Translate_APC_To_NUT(Scrape_Data)
 
         rework_data.Rework_Variables(Scrape_Data)
-
-        # globals.Save_Data({ "raw": Scrape_Data })
     else:
         current_app.logger.warning("Scrape APC unsuccessful.")
 
