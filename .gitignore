@@ -2,6 +2,7 @@ scrap2/
 nutcase/config/*.log
 nutcase/config/*.log.*
 nutcase/app/coverage.txt
+nutcase/config/data/nutcase.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -164,4 +165,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 nutcase/app/coverage.txt
-nutcase/app/coverage.txt
+nutcase/config/data/nutcase.db

@@ -55,6 +55,8 @@ def Format_For_JSON(Scrape_Data, JSON_Elements):
         Output_Dict["server_address"] = Scrape_Data["server_address"]
     if "server_port" in Scrape_Data:
         Output_Dict["server_port"] = Scrape_Data["server_port"]
+    if "logs" in Scrape_Data:
+        Output_Dict["logs"] = Scrape_Data["logs"]
 
     if "ups_list" in Scrape_Data:
         for ups in Scrape_Data["ups_list"]:
@@ -66,6 +68,8 @@ def Format_For_JSON(Scrape_Data, JSON_Elements):
                 Output_Dict[ups["name"]]["clients"] = {}
                 Output_Dict[ups["name"]]["clients"]["count"] = len(ups["clients"])
                 Output_Dict[ups["name"]]["clients"]["list"] = ups["clients"]
+            if "logs" in ups:
+                Output_Dict[ups["name"]]["logs"] = ups["logs"]
 
     if JSON_Elements:
         Output_Dict = Filter_JSON(Output_Dict, JSON_Elements)

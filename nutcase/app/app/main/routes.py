@@ -1,7 +1,5 @@
 from flask import current_app, render_template, request, Response, send_from_directory, flash
-from flask import session
 from markupsafe import Markup       # For building tables
-
 from app.main import bp
 
 from http import HTTPStatus         # For responses
@@ -23,8 +21,8 @@ from app.utils import gui_data_format
 # =======================================================================
 @bp.before_app_request
 def before_request():
-    if configuration.Config_File_Modified(current_app):
-        configuration.Load_Config(current_app)
+    if configuration.Config_File_Modified():
+        configuration.Load_Config()
         current_app.logger.info("Reloading configuration.")
     return
 
@@ -33,28 +31,9 @@ def before_request():
 # ====================================================================================
 @bp.route('/')
 def route_index():
-    # Body_Messages = []
-    # Body_Messages.append( dict(
-    #                 icon  = '<i class="bi-exclamation-octagon" style="font-size: 15px;"></i>',
-    #                 style = 'alert-danger' ,
-    #                 title = 'Get URL failed',
-    #                 body  = 'Return code '
-    #                 ))
     # TODO - reduce logging levels
     for a in request.args:
-        current_app.logger.debug("request.args: key {} value {}".format(a, request.args[a]))
-
-    Addr = request.args.get("addr", default='default')
-    Device = request.args.get("dev", default='default')
-    current_app.logger.debug("route_index: Addr {} Device {}".format(Addr, Device))
-
-    if ('target_device' not in session) or (session['target_device'] != Addr + Device):
-        Length = current_app.config['CHART_SAMPLES']
-        session['bat_ch_y'] = session['in_volt_y'] = \
-            session['out_power_y'] = session['runtime_y'] = \
-              ['null' for i in range(Length)]
-        session['target_device'] = Addr + Device
-
+        current_app.logger.debugv("request.args: key {} value {}".format(a, request.args[a]))
     return render_template('main/index.html', title='Dashboard')
 
 # ====================================================================================
@@ -159,6 +138,8 @@ def route_metrics():
 def route_log(Filename=''):
     if Filename == '':
         Filename = current_app.config['LOGFILE_NAME']
+    if '../' in Filename or Filename[:1] == '/':
+        Filename = current_app.config['LOGFILE_NAME']
 
     # Get the number of lines requested
     Log_Lines = current_app.config["DEFAULT_LOG_LINES"]
@@ -237,5 +218,6 @@ def route_download(Filename=None):
         r = Response(response=HTTPStatus.NOT_FOUND.phrase, status=HTTPStatus.NOT_FOUND)
         return r
 
-    Download_Path = os.path.join(current_app.root_path, current_app.config['LOGFILE_RELATIVE_PATH'])
+    Download_Path = os.path.join(current_app.config['CONFIG_PATH'],
+                                 current_app.config['LOGFILE_SUBPATH'])
     return send_from_directory(Download_Path, Filename)

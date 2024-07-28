@@ -5,3 +5,11 @@ max-line-length = 100
 
 per-file-ignores =
     gui_data_format.py: E501
+    models.py: E501
+    test_log_utils.py: E501
+    test_event_log.py: E501
+    test_scrape.py: E501
+    log_format.py: E501
+    test_db_utils.py: E501
+    test_api_utils.py: E501
+    test_get_update_string.py: E501

@@ -33,7 +33,7 @@
 <!-- Top nav bar -->
 <aside id="id-nav-bar">
   <nav class="navbar navbar-expand-md bg-body-tertiary">
-    <a class="navbar-brand px-3" href="https://github.com/ArthurMitchell42/nutcase"><img src="/static/favicon.ico" style="width:22px;height:22px;"> {{ config['APP_NAME'] }} <span class="fs-6 text-muted">- V{{ config['APP_VERSION'] }}  {% if config['CONFIG_SET'] != 'Prd' %} {{ config['CONFIG_SET'] }} {% endif %}</span></a><span id="ph_update"></span>
+    <a class="navbar-brand px-3" href="https://github.com/ArthurMitchell42/nutcase"><img src="/static/favicon.ico" style="width:22px;height:22px;"> {{ config['APP_NAME'] }} <span class="fs-6 text-muted">- V{{ config['APP_VERSION'] }}  {% if config['CONFIG_SET'] != 'Prd' %} {{ config['CONFIG_SET'] }} {% endif %}</span></a><span>{{ config['UPDATE_HTML']|safe }}</span>
     <div id="ph_debug"></div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -42,6 +42,9 @@
       <ul class="navbar-nav">
         <li class="nav-item" data-bs-toggle="tooltip_navbar" data-bs-placement="bottom" data-bs-html="true" data-bs-title="<small>Click for warning</small>">
           <a class="nav-link d-none" data-bs-toggle="modal" data-bs-target="#warningModal" role="button" id="icon-navbar-warning"><i class="bi bi-exclamation-triangle-fill text-warning"></i></a>
+          {% if config['CONFIG_ERROR'] %}
+          <a class="nav-link" data-bs-toggle="modal" data-bs-target="#configModal" role="button" id="icon-navbar-warning"><i class="bi bi-exclamation-triangle-fill text-warning"></i></a>
+          {% endif %}
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -85,10 +88,8 @@
         <i class="bi bi-info-circle position-relative header-icons">
   {% if config['APP_STATUS_FLAGS'] %}
   <!-- { % if config['APP_STATUS_FLAGS'].info > 0 %} -->
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill header-icon-pill bg-success" id="info-flag-val">
-          {% if config['APP_STATUS_FLAGS'].info > 0 %}{{ config['APP_STATUS_FLAGS'].info }}{% endif %}
-        </span>
-  <!-- { % endif %} -->
+<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill header-icon-pill bg-success" id="info-flag-val">{% if config['APP_STATUS_FLAGS'].info > 0 %}{{ config['APP_STATUS_FLAGS'].info }}{% endif %}</span>
+        <!-- { % endif %} -->
   {% endif %}
       </i>
   </span>
@@ -100,9 +101,7 @@
         <i class="bi bi-exclamation-triangle position-relative header-icons">
   {% if config['APP_STATUS_FLAGS'] %}
   <!-- { % if config['APP_STATUS_FLAGS'].warning > 0 %} -->
-        <span class="position-absolute top-0 start-100  translate-middle badge rounded-pill header-icon-pill bg-warning" id="warn_flag_val" style="font-size: 11px;color: black;">
-          {% if config['APP_STATUS_FLAGS'].warning > 0 %}{{ config['APP_STATUS_FLAGS'].warning }}{% endif %}
-        </span>
+<span class="position-absolute top-0 start-100  translate-middle badge rounded-pill header-icon-pill bg-warning" id="warn_flag_val" style="font-size: 11px;color: black;">{% if config['APP_STATUS_FLAGS'].warning > 0 %}{{ config['APP_STATUS_FLAGS'].warning }}{% endif %}</span>
   <!-- { % endif %}   -->
   {% endif %}
       </i>
@@ -115,9 +114,7 @@
         <i class="bi bi-bell position-relative header-icons">
   {% if config['APP_STATUS_FLAGS'] %}
   <!-- { % if config['APP_STATUS_FLAGS'].alert > 0 %} -->
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill header-icon-pill bg-danger" id="alert_flag_val" style="font-size: 11px;">
-          {% if config['APP_STATUS_FLAGS'].alert > 0 %}{{ config['APP_STATUS_FLAGS'].alert }}{% endif %}
-        </span>
+<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill header-icon-pill bg-danger" id="alert_flag_val" style="font-size: 11px;">{% if config['APP_STATUS_FLAGS'].alert > 0 %}{{ config['APP_STATUS_FLAGS'].alert }}{% endif %}</span>
   <!-- { % endif %} -->
   {% endif %}
       </i>
@@ -167,6 +164,26 @@
 <!-- Central area content supplied by caller -->
 {% block content %}{% endblock %}
 
+<!--============================================ Config warning Modal ============================================-->
+<div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="warningLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img src="/static/favicon.ico" alt="NUTCase" style="width:64px;height:64px;">
+        <h5 class="modal-title" id="warningLabel">Warning</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        There was an issue loading the configuration file nutcase.yml.<br>Please check the log for details.<br>To see information on the config file format please see<br><br>
+        <a href="https://github.com/ArthurMitchell42/nutcase/wiki/The-Configuration-File">the Wiki entry</a><br><br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Scripts -->
 <div id="scripts">
 
@@ -210,23 +227,7 @@
         //   console.log( "complete" );
         // });
 
-    API_URL = "/api/appupdate"
-    $.getJSON( API_URL, function(data) {
-          document.getElementById("ph_update").innerHTML = data.app_update
-        })
-        .done(function(data) {
-          // console.log( "B5_Base devices success" );
-          // document.getElementById("ph-device-menu").innerHTML = data.device_menu
-        })
-        .fail(function() {
-          console.log("No update info after API call " + API_URL)
-          // document.getElementById("ph-main-status").innerHTML = HTML_No_Default
-          return
-        });
-        // .always(function() {
-        //   console.log( "complete" );
-        // });
-
+    updateEventIcons();
   })
 
 //======================================
@@ -272,7 +273,6 @@ function updateEventIcons() {
   }
 
 setInterval('updateEventIcons()', 1000 * 10); // Units: ms
-
 
 </script>
 

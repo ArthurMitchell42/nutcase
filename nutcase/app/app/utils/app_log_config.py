@@ -18,7 +18,7 @@ def Check_Level(Level):
 # Set_Log_Level
 # =================================================================================================
 def Set_Log_Level(app, Level, Handler_Name=None):
-    app.logger.info("Set_Log_Level: Handler_Name {} Level {}".format(Handler_Name, Level))
+    app.logger.debugv("Set_Log_Level: Handler_Name {} Level {}".format(Handler_Name, Level))
 
     if not Handler_Name:
         for Handler in app.logger.handlers:
@@ -33,9 +33,9 @@ def Set_Log_Level(app, Level, Handler_Name=None):
 # =================================================================================================
 def Get_Handler(app, Name):
     for Handler in app.logger.handlers:
-        app.logger.debug("Handler: type {} name {}".format(type(Handler), Handler.name))
+        app.logger.debugvv("Handler: type {} name {}".format(type(Handler), Handler.name))
         if (Handler.name == Name) or (Handler.name is None and Name == Console_Handler_Name):
-            app.logger.debug("Found handler")
+            app.logger.debugvv("Found handler")
             return Handler
     app.logger.debug("Couldn't find handler")
     return None
@@ -53,8 +53,8 @@ def Add_RF_Handler(app):
     Logfile_Handler.setFormatter(logging.Formatter(app.config['LOGFILE_FORMAT']))
     Logfile_Handler.name = RF_Handler_Name
     app.logger.addHandler(Logfile_Handler)
-    app.logger.debug("RF handler added")
-    app.logger.debug("Setting RLHandler parameters: maxBytes {} backupCount {}".format(
+    app.logger.debugvv("RF handler added")
+    app.logger.debugv("Setting RLHandler parameters: maxBytes {} backupCount {}".format(
         app.config['LOGFILE_MAXBYTES'], app.config['LOGFILE_BACKUPCOUNT']))
     return Logfile_Handler
 
@@ -62,7 +62,7 @@ def Add_RF_Handler(app):
 # Update_RF_Handler
 # =================================================================================================
 def Update_RF_Handler(app):
-    app.logger.debug("In Update_RF_Handler")
+    app.logger.debugvv("In Update_RF_Handler")
 
     if Handler := Get_Handler(app, RF_Handler_Name):
         app.logger.removeHandler(Handler)

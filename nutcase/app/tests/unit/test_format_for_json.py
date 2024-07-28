@@ -36,9 +36,6 @@ class BaseTestCase(unittest.TestCase):
 class Test_format_for_json_basics(BaseTestCase):
     def setUp(self):
         super().setUp()
-        # self.app.config.update(
-        #     {"LDAP_USER_RDN_ATTR": "cn", "LDAP_USER_LOGIN_ATTR": "cn"}
-        # )
         self.app.app_context().push()
 
     def tearDown(self):
@@ -83,14 +80,12 @@ class Test_format_for_json_basics(BaseTestCase):
 
         Scrape_Dict['ups_list'].append(Data_UPS1)
         Output_Dict = Format_For_JSON(Scrape_Dict, JSON_Elements)
-        # print("Output_Dict: {}".format(Output_Dict))
+
         self.assertEqual(Output_Dict['nutcase_version'], 'NUTCase 0.3.0 Beta 7')
         self.assertEqual(Output_Dict['server_version'], 'DSM7-1-1-42930-workplus')
         self.assertEqual(Output_Dict['server_address'], '10.0.0.1')
         self.assertEqual(Output_Dict['server_port'], 3493)
-
         self.assertEqual(Output_Dict['ups1']['description'], Data_UPS1['description'])
-        # self.assertEqual(Output_Dict['ups1']['clients'], {'count': 0, 'list': []})
 
     # simple
     def test_simple_one_ups_vars(self):
@@ -110,14 +105,12 @@ class Test_format_for_json_basics(BaseTestCase):
 
         Scrape_Dict['ups_list'].append(Data_UPS1)
         Output_Dict = Format_For_JSON(Scrape_Dict, JSON_Elements)
-        # print("Output_Dict: {}".format(Output_Dict))
         self.assertEqual(Output_Dict['nutcase_version'], 'NUTCase 0.3.0 Beta 7')
         self.assertEqual(Output_Dict['server_version'], 'DSM7-1-1-42930-workplus')
         self.assertEqual(Output_Dict['server_address'], '10.0.0.1')
         self.assertEqual(Output_Dict['server_port'], 3493)
 
         self.assertEqual(Output_Dict['ups1']['description'], Data_UPS1['description'])
-        # self.assertEqual(Output_Dict['ups1']['clients'], {'count': 0, 'list': []})
         self.assertEqual(Output_Dict['ups1'][Data_UPS1['variables'][0]['name']],
                                                 Data_UPS1['variables'][0]['value'])
         self.assertEqual(Output_Dict['ups1'][Data_UPS1['variables'][1]['name']],
@@ -152,7 +145,7 @@ class Test_format_for_json_basics(BaseTestCase):
         Scrape_Dict['ups_list'].append(Data_UPS1)
         Scrape_Dict['ups_list'].append(Data_UPS2)
         Output_Dict = Format_For_JSON(Scrape_Dict, JSON_Elements)
-        # print("Output_Dict: {}".format(Output_Dict))
+
         self.assertEqual(Output_Dict['nutcase_version'], 'NUTCase 0.3.0 Beta 7')
         self.assertEqual(Output_Dict['server_version'], 'DSM7-1-1-42930-workplus')
         self.assertEqual(Output_Dict['server_address'], '10.0.0.1')
@@ -190,11 +183,47 @@ class Test_format_for_json_basics(BaseTestCase):
 
         Scrape_Dict['ups_list'].append(Data_UPS1)
         Output_Dict = Format_For_JSON(Scrape_Dict, JSON_Elements)
-        # print("Output_Dict: {}".format(Output_Dict))
         self.assertEqual(Output_Dict['nutcase_version'], 'NUTCase 0.3.0 Beta 7')
         self.assertEqual(Output_Dict['server_version'], 'DSM7-1-1-42930-workplus')
         self.assertEqual(Output_Dict['server_address'], '10.0.0.1')
         self.assertEqual(Output_Dict['server_port'], 3493)
+
+        self.assertEqual(Output_Dict['ups1']['description'], Data_UPS1['description'])
+        self.assertEqual(Output_Dict['ups1']['clients'], {'count': len(Data_UPS1['clients']),
+                                                          'list': Data_UPS1['clients']})
+        self.assertEqual(Output_Dict['ups1'][Data_UPS1['variables'][0]['name']],
+                                             Data_UPS1['variables'][0]['value'])
+        self.assertEqual(Output_Dict['ups1'][Data_UPS1['variables'][1]['name']],
+                                             Data_UPS1['variables'][1]['value'])
+
+    # Test logs
+    def test_logs(self):
+        Scrape_Dict = copy.deepcopy(Base_Scrape_Data)
+        Scrape_Dict.update( logs = {
+            "total": [1, 2, 3],
+            "unread":  [4, 5, 6]
+        })
+        JSON_Elements = []
+        Data_UPS1 = {
+                    'name': 'ups1',
+                    'description': 'Description one',
+                    'variables': [
+                        {'name': 'ups1.one', 'value': 'val_one'},
+                        {'name': 'ups1.two', 'value': 'val_two'}
+                        ],
+                    'clients': ["10.0.0.1"],
+                    'server_address': '10.0.0.1',
+                    'server_port': 3493
+                    }
+
+        Scrape_Dict['ups_list'].append(Data_UPS1)
+        Output_Dict = Format_For_JSON(Scrape_Dict, JSON_Elements)
+        self.assertEqual(Output_Dict['nutcase_version'], 'NUTCase 0.3.0 Beta 7')
+        self.assertEqual(Output_Dict['server_version'], 'DSM7-1-1-42930-workplus')
+        self.assertEqual(Output_Dict['server_address'], '10.0.0.1')
+        self.assertEqual(Output_Dict['server_port'], 3493)
+        self.assertEqual(Output_Dict['logs']['total'], [1, 2, 3])
+        self.assertEqual(Output_Dict['logs']['unread'], [4, 5, 6])
 
         self.assertEqual(Output_Dict['ups1']['description'], Data_UPS1['description'])
         self.assertEqual(Output_Dict['ups1']['clients'], {'count': len(Data_UPS1['clients']),

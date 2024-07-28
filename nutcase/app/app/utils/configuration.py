@@ -2,91 +2,110 @@ import logging
 import os
 import yaml
 from pathlib import PurePath
-
+from flask import current_app
 from app.utils import app_log_config
 
 # ===================================================================================================
+# region Load & Save YAML
 # Load_YAML_As_Dictionary
 # ===================================================================================================
-def Load_YAML_As_Dictionary( app, Filename):
+def Load_YAML_As_Dictionary(app, Filename):
     # ================================================================================
     # Load the YAML and convert to a dictionary
     # ================================================================================
     try:
         with open(Filename, "r") as File_Handle:
             try:
-                Data = yaml.safe_load( File_Handle)
-                app.logger.debugv("Loaded YAML from {}".format( Filename))
+                Data = yaml.safe_load(File_Handle)
+                app.logger.info("Loaded YAML from {}".format(Filename))
             except yaml.YAMLError as Error:
-                app.logger.error("Error loading YAML {}".format( Error))
+                app.logger.error("Error loading YAML {}".format(Error))
                 return None
     except Exception as Error:
-        app.logger.warning("Could not open YAML file {}. Error: {}".format( Filename, Error))
+        app.logger.warning("Could not open YAML file {}. Error: {}".format(Filename, Error))
         return None
     return Data
 
 # ===================================================================================================
 # Save_Dictionary_As_YAML
 # ===================================================================================================
-def Save_Dictionary_As_YAML( app, Filename, Data):
+def Save_Dictionary_As_YAML(app, Filename, Data):
     # ================================================================================
     # Save the dictionary as YAML
     # ================================================================================
     try:
         with open(Filename, "w") as File_Handle:
             try:
-                yaml.dump( Data, File_Handle)
+                yaml.dump(Data, File_Handle)
             except yaml.YAMLError as Error:
-                app.logger.error("Error loading YAML {}".format( Error))
+                app.logger.error("Error loading YAML {}".format(Error))
                 return False
     except Exception as Error:
-        app.logger.warning("Could not save YAML file {}. Error: {}".format( Filename, Error))
+        app.logger.warning("Could not save YAML file {}. Error: {}".format(Filename, Error))
         return False
     return True
 
 # ======================================================================
+# region Utils
 # Get_Server - Return the server dictionary from Config->settings
 #   or None
 # ======================================================================
-def Get_Server( app, Address):
+def Get_Server(Address):
     Server = None
-    for s in app.config['SERVERS']:
+    for s in current_app.config['SERVERS']:
         if s['server'] == Address:
             Server = s
             break
     return Server
 
 # ======================================================================
-# Update_Settings - Implement the contents of Config->settings
+# Get_Server - Return the server dictionary from Config->settings
+#   or None
 # ======================================================================
-def Update_Settings( Config, app):
+def Get_Device(Server_Address, Device_Name):
+    Device = None
+    Server = Get_Server(Server_Address)
+
+    if Server:
+        if 'devices' in Server:
+            for dev in Server['devices']:
+                if dev['device'] == Device_Name:
+                    Device = dev
+                    break
+    return Device
+
+# ======================================================================
+# region Update_Settings
+# Implement the contents of Config->settings
+# ======================================================================
+def Update_Settings(Config):
     # ======================================================================
     if "order_metrics" in Config["settings"]:
         if isinstance(Config["settings"]["order_metrics"], bool):
-            app.config["ORDER_METRICS"] = Config["settings"]["order_metrics"]
+            current_app.config["ORDER_METRICS"] = Config["settings"]["order_metrics"]
 
     if "coloured_log" in Config["settings"]:
         if isinstance(Config["settings"]["coloured_log"], bool):
-            app.config["COLOURED_LOG"] = Config["settings"]["coloured_log"]
+            current_app.config["COLOURED_LOG"] = Config["settings"]["coloured_log"]
 
     # ======================================================================
     if "default_log_lines" in Config["settings"]:
         if isinstance(Config["settings"]["default_log_lines"], int):
-            app.config["DEFAULT_LOG_LINES"] = Config["settings"]["default_log_lines"]
+            current_app.config["DEFAULT_LOG_LINES"] = Config["settings"]["default_log_lines"]
 
     # ======================================================================
     if "cache_period" in Config["settings"]:
         if isinstance(Config["settings"]["cache_period"], int):
-            app.config["CACHE_PERIOD"] = Config["settings"]["cache_period"]
+            current_app.config["CACHE_PERIOD"] = Config["settings"]["cache_period"]
 
     # ======================================================================
     if "apc_strip_units" in Config["settings"]:
         if isinstance(Config["settings"]["apc_strip_units"], bool):
-            app.config["APC_STRIP_UNITS"] = Config["settings"]["apc_strip_units"]
+            current_app.config["APC_STRIP_UNITS"] = Config["settings"]["apc_strip_units"]
 
     # ======================================================================
     if "ui_format_runtime" in Config["settings"]:
-        app.config['UI']["FORMAT_RUNTIME"] = Config["settings"]["ui_format_runtime"]
+        current_app.config['UI']["FORMAT_RUNTIME"] = Config["settings"]["ui_format_runtime"]
 
     # ======================================================================
     # Log file settings
@@ -94,16 +113,16 @@ def Update_Settings( Config, app):
     Update_RF_Handler = False
     if "log_maxbytes" in Config["settings"]:
         if isinstance(Config["settings"]["log_maxbytes"], int):
-            app.config["LOGFILE_MAXBYTES"] = Config["settings"]["log_maxbytes"]
+            current_app.config["LOGFILE_MAXBYTES"] = Config["settings"]["log_maxbytes"]
             Update_RF_Handler = True
 
     if "log_backupcount" in Config["settings"]:
         if isinstance(Config["settings"]["log_backupcount"], int):
-            app.config["LOGFILE_BACKUPCOUNT"] = Config["settings"]["log_backupcount"]
+            current_app.config["LOGFILE_BACKUPCOUNT"] = Config["settings"]["log_backupcount"]
             Update_RF_Handler = True
 
     if Update_RF_Handler:
-        app_log_config.Update_RF_Handler( app)
+        app_log_config.Update_RF_Handler(current_app)
 
     Console_Level = Logfile_Level = None
     if "log_level" in Config["settings"]:
@@ -119,50 +138,49 @@ def Update_Settings( Config, app):
             Logfile_Level = Config["settings"]["log_level_logfile"].upper()
 
     if Console_Level:
-        app_log_config.Set_Log_Level( app, Console_Level, "con")
-        app.logger.info("Setting console log level from config {}".format( Console_Level))
+        app_log_config.Set_Log_Level( current_app, Console_Level, "con")
 
     if Logfile_Level:
-        app_log_config.Set_Log_Level( app, Logfile_Level, "rfh")
-        app.logger.info("Setting logfile log level from config {}".format( Logfile_Level))
+        app_log_config.Set_Log_Level( current_app, Logfile_Level, "rfh")
 
     # ======================================================================
     # As a beta testing measure only, the log level can be overridden
     # ======================================================================
-    if app.config["BETA_OVERRIDE"]:
-        Console_Handler = app_log_config.Get_Handler( app, 'con')
+    if current_app.config["BETA_OVERRIDE"]:
+        Console_Handler = app_log_config.Get_Handler( current_app, 'con')
         if 'DEBUG' not in logging.getLevelName(Console_Handler):
             Console_Handler.setLevel( 'DEBUG')
-            app.logger.warning("Beta override: Console logging level overridden to DEBUG.")
+            current_app.logger.warning("Beta override: Console logging level overridden to DEBUG.")
 
-        Logfile_Handler = app_log_config.Get_Handler( app, 'rfh')
+        Logfile_Handler = app_log_config.Get_Handler( current_app, 'rfh')
         if 'DEBUG' not in logging.getLevelName(Logfile_Handler):
             Logfile_Handler.setLevel( 'DEBUG')
-            app.logger.warning("Beta override: Logfile logging level overridden to DEBUG.")
+            current_app.logger.warning("Beta override: Logfile logging level overridden to DEBUG.")
 
     # ======================================================================
     # Webhook settings
     # ======================================================================
     if "webhooks" in Config:
-        # app.config["WEBHOOKS"] = Config["webhooks"]
-        app.config.update( WEBHOOKS = Config["webhooks"])
+        current_app.config.update( WEBHOOKS = Config["webhooks"])
 
     # ======================================================================
     # Rework settings
     # ======================================================================
     if "rework" in Config:
-        # app.config["REWORK"] = Config["rework"]
-        app.config.update( REWORK = Config["rework"])
+        current_app.config.update( REWORK = Config["rework"])
 
     # ======================================================================
     # Servers & Credentials settings
     # ======================================================================
     if "servers" in Config:
-        app.config["SERVERS"] = Config["servers"]
-        # if "credentials" in Config:
-        for Srv in app.config["SERVERS"]:
+        current_app.config["SERVERS"] = Config["servers"]
+
+        for Srv in current_app.config["SERVERS"]:
+            if 'mode' not in Srv:
+                Srv['mode'] = 'nut'
+
             if 'username' in Srv and 'password' in Srv:
-                app.config["CREDENTIALS"].append( {
+                current_app.config["CREDENTIALS"].append( {
                     'server': Srv['server'],
                     'device': Srv['device'],
                     'username': Srv['username'],
@@ -173,13 +191,15 @@ def Update_Settings( Config, app):
 # ======================================================================
 # Config_File_Modified
 # ======================================================================
-def Config_File_Modified( app):
-    if not os.path.isfile( app.config["CONFIG_FULLNAME"]):
-        app.logger.warning("Config file missing {}".format( app.config["CONFIG_FULLNAME"]))
+def Config_File_Modified():
+    if not os.path.isfile( current_app.config["CONFIG_FULLNAME"]):
+        current_app.logger.warning("Config file missing {}".format(
+                                current_app.config["CONFIG_FULLNAME"]))
         return False
 
-    if os.path.getmtime(app.config["CONFIG_FULLNAME"]) > app.config["CONFIG_MOD_TIME"]:
-        app.logger.debug("Config file has been updated")
+    if os.path.getmtime(current_app.config["CONFIG_FULLNAME"]) > \
+                current_app.config["CONFIG_MOD_TIME"]:
+        current_app.logger.info("Config file has been updated")
         return True
     return False
 
@@ -187,60 +207,59 @@ def Config_File_Modified( app):
 # Check and add variables that are requested to be reworks to a list in the reworks dictionary
 #   This speeds up parsing after a scrape by making a quick lookup table of vaiable names.
 # =============================================================================================
-def List_Variables( Config, app):
+def List_Variables(Config):
     Var_List = []
     for Rework in Config['rework']:
-        if Rework["from"] not in Var_List:
-            Var_List.append( Rework["from"])
+        if "from" in Rework:
+            if Rework["from"] not in Var_List:
+                Var_List.append( Rework["from"])
 
-    app.config["REWORK_VAR_LIST"] = Var_List
+    current_app.config["REWORK_VAR_LIST"] = Var_List
     return
 
 # =============================================================================================
-# Load_Config
+# region Parse_Config
 #   Returns:
 #       True  : Config passes tests
 #       False : Config failed tests
 # =============================================================================================
-def Parse_Config( Config, app):
+def Parse_Config(Config):
     Sections          = ['rework', 'settings', 'webhooks', 'servers']
-    Styles            = ['time', 'simple-enum', 'ratio', 'comp-enum', 'cl-count', 'cl-check']
-    Expected_WebHooks = ['default', 'ok', 'fail']
-
-    # ================================================================================
-    # Check information is present
-    # ================================================================================
-    if not Config or len( Config) == 0:
-        app.logger.debug("Control file has no directives")
-        return False
+    Styles            = ['time', 'simple-enum', 'ratio', 'comp-enum', 'cl-count',
+                         'cl-check', 'nutcase_logs']
+    Expected_WebHooks = ['ok', 'fail']
 
     # ================================================================================
     # All Sections entries should always be in the Config dictionary, even if empty
     # ================================================================================
     for Expected_Section in Sections:
         if Expected_Section not in Config:
-            Config[Expected_Section] = {}
+            if Expected_Section == 'servers' or Expected_Section == 'rework':
+                Config[Expected_Section] = []
+            else:
+                Config[Expected_Section] = {}
         if not Config[Expected_Section]:
-            Config[Expected_Section] = {}
+            if Expected_Section == 'servers' or Expected_Section == 'rework':
+                Config[Expected_Section] = []
+            else:
+                Config[Expected_Section] = {}
 
     # ================================================================================
     for Section in Config:
-        try:
-            assert Section in Sections
-        except AssertionError:
-            app.logger.warning("Unknown section type {}".format( Section))
+        if Section not in Sections:
+            current_app.config.update(CONFIG_ERROR = True)
+            current_app.logger.warning("Unknown section type {}".format( Section))
 
     # ================================================================================
-    # Check all required fields are present
+    # Check 'webhooks'
     # ================================================================================
-
-    # ================================================================================
-    # if 'webhooks' in Config:
     for Hook_Name in Config['webhooks']:
         try:
-            assert Hook_Name in Expected_WebHooks
+            if Hook_Name != 'default':
+                assert Hook_Name in Expected_WebHooks
         except AssertionError:
-            app.logger.warning("Unknown WebHook name {}. Expected names: {}".format(
+            current_app.config.update(CONFIG_ERROR = True)
+            current_app.logger.warning("Unknown WebHook name {}. Expected names: {}".format(
                 Hook_Name,
                 ",".join(Expected_WebHooks)))
 
@@ -249,83 +268,110 @@ def Parse_Config( Config, app):
             try:
                 assert Expected_Name in Config['webhooks']
             except AssertionError:
-                app.logger.warning("Config is missing WebHook name {}".format( Expected_Name))
+                current_app.logger.warning("Config is missing WebHook name {}".format(
+                                                                        Expected_Name))
 
     # ================================================================================
-    # if 'rework' in Config:
+    # Check 'rework'
+    # ================================================================================
     Checked_Rework = []
     for Entry in Config['rework']:
-        Include_Directive = True
         try:
-            assert 'from' in Entry
             assert 'to' in Entry
             assert 'style' in Entry
             assert 'control' in Entry
-        except AssertionError:
-            app.logger.error("All rework's must have from to style & control {}".format(Entry))
-            Include_Directive = False
-
-        try:
-            assert Entry['style'] in Styles
-        except AssertionError:
-            app.logger.error("Unknown style {}, styles are: {}".format( Entry, ", ".join(Styles)))
-            Include_Directive = False
-
-        # ===============================================================================================
-        if Include_Directive and Entry['style'] == 'simple-enum' or Entry['style'] == 'comp-enum':
-            try:
-                assert isinstance( Entry['control'], dict)
-            except AssertionError:
-                app.logger.error("simple-enum control must be dictionary Found:\n{}".format(
-                                        Entry['control']))
-                Include_Directive = False
+            if Entry['style'] != "nutcase_logs":
+                assert 'from' in Entry
 
             try:
-                assert 'from' in Entry['control']
-                assert 'to' in Entry['control']
-                assert 'default' in Entry['control']
-                assert isinstance( Entry['control']['from'], list)
-                assert isinstance( Entry['control']['to'], list)
-                assert len( Entry['control']['from']) == len( Entry['control']['to'])
+                assert Entry['style'] in Styles
             except AssertionError:
-                app.logger.error(
-                    "enum control needs from to & default. from & to equal len\n{}".format(Entry))
-                Include_Directive = False
-        # =========================================================================================
-        elif Include_Directive and Entry['style'] == 'cl-count':
-            try:
-                assert isinstance( Entry['control'], list)
-                assert len(Entry['control']) == 4
-                Entry['control'][0] = int( Entry['control'][0])
-            except AssertionError:
-                app.logger.error(
-                    "cl-count control=4 el. array, elem0 must be int\n{}".format(Entry))
-                Include_Directive = False
-        # =========================================================================================
-        elif Include_Directive and Entry['style'] == 'cl-check':
-            try:
-                assert isinstance( Entry['control'], list)
-                assert len(Entry['control']) > 0
-            except AssertionError:
-                app.logger.error(
-                    "cl-check must have a non-zero length array for 'control'.\n{}".format( Entry))
-                Include_Directive = False
+                current_app.logger.error("Unknown style {}, styles are: {}".format( Entry,
+                                                                            ", ".join(Styles)))
+                continue
 
-        if Include_Directive:
+            # =====================================================================================
+            if Entry['style'] == 'simple-enum' or Entry['style'] == 'comp-enum':
+                try:
+                    assert isinstance( Entry['control'], dict)
+                except AssertionError:
+                    current_app.logger.error(
+                        "simple-enum control must be dictionary Found: {}".format(Entry['control']))
+                    continue
+
+                try:
+                    assert 'from' in Entry['control']
+                    assert 'to' in Entry['control']
+                    assert 'default' in Entry['control']
+                    assert isinstance( Entry['control']['from'], list)
+                    assert isinstance( Entry['control']['to'], list)
+                    assert len( Entry['control']['from']) == len( Entry['control']['to'])
+                except AssertionError:
+                    current_app.logger.error(
+                        "enum control needs from to & default, from & to equal len")
+                    continue
+            # =========================================================================================
+            elif Entry['style'] == 'cl-count':
+                try:
+                    assert isinstance( Entry['control'], list)
+                    assert len(Entry['control']) == 4
+                    if isinstance(Entry['control'][0], str):
+                        if Entry['control'][0] == 'auto':
+                            assert True
+                        elif Entry['control'][0].isnumeric():
+                            assert True
+                        else:
+                            assert False
+                    elif isinstance(Entry['control'][0], int):
+                        assert True
+                    else:
+                        assert False
+                except Exception:
+                    current_app.logger.error(
+                        "cl-count control=4 el. array, elem0 must be int")
+                    continue
+            # =========================================================================================
+            elif Entry['style'] == 'cl-check':
+                try:
+                    if isinstance( Entry['control'], list):
+                        assert len(Entry['control']) > 0
+                    elif isinstance( Entry['control'], str):
+                        assert Entry['control'] == "auto"
+                    else:
+                        assert False
+                except AssertionError:
+                    current_app.logger.error(
+                        "cl-check must have a non-zero length array for 'control'")
+                    continue
+            # =========================================================================================
+            elif Entry['style'] == 'nutcase_logs':
+                try:
+                    assert isinstance( Entry['control'], str)
+                except AssertionError:
+                    current_app.logger.error(
+                        "nutcase_logs must have a string for 'control'")
+                    continue
+
             Checked_Rework.append(Entry)
+        except AssertionError:
+            current_app.logger.error("All rework's must have from to style & control")
 
     Config['rework'] = Checked_Rework
 
     # ================================================================================
-    # if 'servers' in Config:
+    # Check 'servers'
+    # ================================================================================
     for Entry in Config['servers']:
         try:
             assert 'server' in Entry
             assert 'port' in Entry
-            assert 'device' in Entry
+            assert 'devices' in Entry
+            assert isinstance( Entry['devices'], list)
+            assert len(Entry['devices']) > 0
         except AssertionError:
-            app.logger.error(
-                "Server entries must have 'server', 'port' and 'device' entires {}".format(Entry))
+            current_app.logger.error(
+                "Server entries must have 'server', 'port' and at least one entry "
+                "in the 'devices' list")
             return False
 
     return True
@@ -333,80 +379,78 @@ def Parse_Config( Config, app):
 # ===================================================================================================
 # Identify_Config_File
 # ===================================================================================================
-def Identify_Config_File( app):
+def Identify_Config_File():
     # ================================================================================
     # Find the configuration file starting with .yml and changing to .yaml in needed
     # A user setting in the CONFIG_FILE overrides this.
     # ================================================================================
-    app.logger.debugv("Load_Config: CONFIG_PATH {} CONFIG_FILE {}".format(
-            app.config['CONFIG_PATH'], app.config['CONFIG_FILE']))
-    Config_Filename = os.path.join(app.config['CONFIG_PATH'], app.config['CONFIG_FILE'])
+    Config_Filename = os.path.join(current_app.config['CONFIG_PATH'],
+                                   current_app.config['CONFIG_FILE'])
 
-    p = PurePath( Config_Filename)
+    p = PurePath(Config_Filename)
     Check_Filename = p.with_suffix('.yml')
 
-    app.logger.debugv("Load_Config: Trying Check_Filename {}".format( Check_Filename))
-
-    if not os.path.isfile( Check_Filename):
+    if not os.path.isfile(Check_Filename):
         Check_Filename = p.with_suffix('.yaml')
-        app.logger.debugv("Load_Config: Not found, Trying Check_Filename {}".format(
-                                                                Check_Filename))
-        if not os.path.isfile( Check_Filename):
-            app.logger.warning("Config file not found as either .yml or .yaml {}".format(
-                                app.config['CONFIG_FILE']))
+        if not os.path.isfile(Check_Filename):
+            current_app.logger.warning("Config file ({}) not found as either .yml or .yaml".format(
+                                current_app.config['CONFIG_FILE']))
             return None
 
-    app.logger.debug("Config file is {}".format( Check_Filename))
-    app.config.update( CONFIG_FULLNAME = Check_Filename)
+    current_app.logger.info("Config file is {}".format( Check_Filename))
+    current_app.config.update( CONFIG_FULLNAME = Check_Filename)
     return Check_Filename
 
 # ===================================================================================================
-# Load_Config
+# region Load_Config
 # ===================================================================================================
-def Load_Config( app):
+def Load_Config():
     # ================================================================================
     # Put the identified config file name in CONFIG_FULLNAME
     # ================================================================================
-    Config_Filename = Identify_Config_File( app)
+    Config_Filename = Identify_Config_File()
+    if not Config_Filename:
+        current_app.config.update(CONFIG_ERROR = True)
+        current_app.logger.warning("Couldn't identify config file {}".format( Config_Filename))
+        return None
 
     # ================================================================================
     # Load the YAML and convert to a dictionary
     # ================================================================================
-    Config = Load_YAML_As_Dictionary( app, Config_Filename)
+    Config = Load_YAML_As_Dictionary(current_app, Config_Filename)
+    if not Config:
+        current_app.config.update(CONFIG_ERROR = True)
+        current_app.logger.warning("Couldn't load YAML {}".format( Config_Filename))
+        return None
 
     # ====================================================================
     # Record the mod time of the config file
     # ====================================================================
-    if Config_Filename and os.path.isfile( Config_Filename):
-        app.config.update( CONFIG_MOD_TIME = os.path.getmtime( Config_Filename))
+    current_app.config.update(CONFIG_MOD_TIME = os.path.getmtime(Config_Filename))
 
     # ================================================================================
     # Do validity checking in the loaded configuration
     # ================================================================================
-    if not Parse_Config( Config, app):
-        app.logger.error("Config file has issues, file ignored {}".format( Config_Filename))
+    if not Parse_Config(Config):
+        current_app.logger.error("Config file has issues, file ignored {}".format(Config_Filename))
+        current_app.config.update(CONFIG_ERROR = True)
         return None
 
     # ================================================================================
     # Act on settings
     # ================================================================================
-    Update_Settings( Config, app)
+    Update_Settings(Config)
 
     # ================================================================================
     # Prepare a list of variables to be reworked in the dictionary
     #   This LUT speeds up parsing after a scrape.
     # ================================================================================
     if Config:
-        List_Variables( Config, app)
+        List_Variables(Config)
 
-    app.logger.debugv("Config in use:\n{}".format( Config))
-    app.logger.debugv("ORDER_METRICS: {}".format(  app.config["ORDER_METRICS"]))
-    app.logger.debugv("COLOURED_LOG: {}".format(  app.config["COLOURED_LOG"]))
-    app.logger.debugv("DEFAULT_LOG_LINES: {}".format(  app.config["DEFAULT_LOG_LINES"]))
-    app.logger.debugv("CACHE_PERIOD: {}".format(  app.config["CACHE_PERIOD"]))
-    app.logger.debugv("WEBHOOKS: {}".format(  app.config["WEBHOOKS"]))
-    app.logger.debugv("REWORK_VAR_LIST: {}".format(  app.config["REWORK_VAR_LIST"]))
-    app.logger.debugv("CREDENTIALS: {}".format(  app.config["CREDENTIALS"]))
-    app.logger.debugv("REWORK: {}".format(  app.config["REWORK"]))
+    current_app.logger.debugv("Config in use:\n{}".format(Config))
+    current_app.logger.debugv("WEBHOOKS: {}".format(current_app.config["WEBHOOKS"]))
+    current_app.logger.debugv("REWORK_VAR_LIST: {}".format(current_app.config["REWORK_VAR_LIST"]))
+    current_app.logger.debugv("REWORK: {}".format(current_app.config["REWORK"]))
 
     return Config
