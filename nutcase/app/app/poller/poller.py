@@ -148,8 +148,10 @@ def Check_Status(Previous_Data, Current_Data):
         Log_Event_Message(Log_Info)
     if "CHRG" in Current_Data['ups.status'] and "CHRG" not in Previous_Data['ups.status']:
         Log_Info['title'] = "Charging started"
-        Log_Info['detail'] = "Device {} on server {} started to charge.".format(
-                                Current_Data['device'], Current_Data['server_address'])
+        Log_Info['detail'] = "Device {} on server {} started to charge. Battery {}%".format(
+                                Current_Data['device'],
+                                Current_Data['server_address'],
+                                Current_Data['battery.charge'])
         Log_Info['server'] = Current_Data['server_address']
         Log_Info['device'] = Current_Data['device']
         Log_Info['category'] = Log_Category.Battery.name

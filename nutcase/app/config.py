@@ -23,7 +23,7 @@ class Config(object):
     # region Core info
     # ===================================================================================
     APP_NAME        = 'NUTCase'
-    APP_VERSION     = '0.4.0.0'
+    APP_VERSION     = '0.4.0.1'
     UPDATE_HTML     = ''
     GITHUB_API_URL  = "https://api.github.com/repos/ArthurMitchell42/nutcase/"
 
@@ -59,7 +59,7 @@ class Config(object):
     # ===================================================================================
     DOWNLOAD_TIMESTAMP_FORMAT = "%Y-%m-%d_%H-%M-%S"
 
-    CONFIG_MOD_TIME       = int
+    CONFIG_MOD_TIME       = 0.0
     CONFIG_FULLNAME       = ''
 
     ORDER_METRICS         = True

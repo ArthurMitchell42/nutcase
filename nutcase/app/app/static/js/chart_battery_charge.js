@@ -13,7 +13,7 @@ const chart_battery_charge_data = {
       ],
     datasets: [
       {
-      label: 'Output Power',
+      label: 'Battery charge',
       data: [ 0 ],
       fill: {
         target: 'origin',
@@ -40,7 +40,7 @@ const chart_battery_charge_data = {
         text: 'Battery Charge',
         // display: false,
         display: true,
-        align: Chart_Title_Align, 
+        align: Chart_Title_Align,
         font: { size: Chart_Title_Size },
         color: Chart_Battery_Charge_Title_Colour
     },
@@ -74,9 +74,9 @@ const chart_battery_charge_data = {
       }
     }
   };
-  
+
   const chart_battery_charge_scales = {
-    y: { 
+    y: {
       // position: 'right',
       title: {
           display: true,
@@ -108,14 +108,13 @@ const chart_battery_charge_data = {
       plugins: chart_battery_charge_plugins,
       scales: chart_battery_charge_scales,
     };
-  
+
   const chart_battery_charge_config = {
     type: 'line',
     data: chart_battery_charge_data,
     options: chart_battery_charge_options,
     // plugins: [plugin],
   };
-  
+
   const chart_battery_charge_canvas = document.getElementById('chart_battery_charge').getContext('2d');
   var chart_battery_charge_obj = new Chart(chart_battery_charge_canvas, chart_battery_charge_config);
-  
