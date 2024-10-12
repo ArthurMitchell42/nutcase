@@ -23,7 +23,7 @@ class Config(object):
     # region Core info
     # ===================================================================================
     APP_NAME        = 'NUTCase'
-    APP_VERSION     = '0.4.0.1'
+    APP_VERSION     = '0.4.0.2'
     UPDATE_HTML     = ''
     GITHUB_API_URL  = "https://api.github.com/repos/ArthurMitchell42/nutcase/"
 

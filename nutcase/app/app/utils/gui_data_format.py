@@ -389,9 +389,9 @@ def Chart_Runtime(UPS, Result):
     if not (Runtime := format_to_text.Get_NUT_Variable(UPS, 'battery.runtime')):
         Runtime = 0
 
-    if Runtime:
-        Runtime_Y.append(float(Runtime) / 60.0)
-        Runtime_Y.pop(0)
+    Runtime_Y.append(float(Runtime) / 60.0)
+    Runtime_Y.pop(0)
+
     Result['runtime_y'] = Runtime_Y
     session[Target_Device]['runtime_y'] = Runtime_Y
 
