@@ -58,6 +58,8 @@ def route_default():
                 Result['addr']   = s['server']
                 Result['port']   = s['port']
                 Result['device'] = d['device']
+                if 'mode' in d:
+                    Result['mode'] = d['mode']
                 if 'default' in d:
                     if d['default']:
                         print("route default: return {} as default".format(d))
