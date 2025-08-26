@@ -132,7 +132,7 @@ Currently supports 'AMD64', 'ARM64 (ARM64V8)' (suitable for running on docker un
 <h3 id="contents">Contents</h3>
 
 Getting started
-  * [Instalation](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container)
+  * [Installation](https://github.com/ArthurMitchell42/nutcase/wiki/Running-the-NUTCase-container)
   * [Accessing Nutcase](https://github.com/ArthurMitchell42/nutcase/wiki/Accessing-and-Using-NUTCase)
   * [Configuring NUTCase](https://github.com/ArthurMitchell42/nutcase/wiki/The-Configuration-File)
 
