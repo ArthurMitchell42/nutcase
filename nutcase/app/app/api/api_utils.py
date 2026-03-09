@@ -16,7 +16,7 @@ def Get_Update_String():
     Result = ""
     try:
         URL = current_app.config['GITHUB_API_URL'] + "releases"
-        Response = urllib.request.urlopen(URL)
+        Response = urllib.request.urlopen(URL, timeout=3)
         HTTP_Code = Response.getcode()
         if HTTP_Code != HTTPStatus.OK:
             current_app.logger.warning("Github returned {}: {}".format(
