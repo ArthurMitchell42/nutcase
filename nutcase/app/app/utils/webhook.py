@@ -9,7 +9,7 @@ from http import HTTPStatus
 # ==================================================================================================
 def Call_URL(app, URL):
     try:
-        Response = urllib.request.urlopen(URL)
+        Response = urllib.request.urlopen(URL, timeout=3)
         HTTP_Code = Response.getcode()
         if HTTP_Code != HTTPStatus.OK:
             app.logger.warning("WebHook returned {}: {}".format(
